@@ -6,6 +6,8 @@ import { blogs } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { likeBlog } from '../actions';
 
+export const dynamic = 'force-dynamic'; 
+
 interface BlogPageProps {
   params: Promise<{ id: string }>;
 }
