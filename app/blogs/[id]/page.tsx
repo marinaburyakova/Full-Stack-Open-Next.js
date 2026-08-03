@@ -1,7 +1,9 @@
 // app/blogs/[id]/page.tsx
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { blogsDb } from '../data';
+import { db } from '../../db';
+import { blogs } from '../../db/schema';
+import { eq } from 'drizzle-orm';
 import { likeBlog } from '../actions';
 
 interface BlogPageProps {
@@ -12,7 +14,12 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
   const resolvedParams = await params;
   const { id } = resolvedParams;
 
-  const blog = blogsDb.find((b) => b.id === id);
+  // Ищем запись в базе данных по id
+  const [blog] = await db
+    .select()
+    .from(blogs)
+    .where(eq(blogs.id, id))
+    .limit(1);
 
   if (!blog) {
     notFound();
@@ -50,15 +57,11 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
             </a>
           </div>
 
-          {/* Интерактивная зона с лайками */}
           <div className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-lg border border-gray-100 mt-4">
             <span className="text-gray-600 font-medium">Rating: <span className="font-bold text-gray-900">{blog.likes} likes</span></span>
             
-            {/* Форма для отправки Server Action */}
             <form action={likeBlog}>
-              {/* Скрытое поле, передающее ID блога на сервер */}
               <input type="hidden" name="id" value={blog.id} />
-              
               <button
                 type="submit"
                 className="px-4 py-1.5 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition active:scale-95 cursor-pointer"

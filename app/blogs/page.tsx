@@ -1,26 +1,25 @@
 // app/blogs/page.tsx
 import Link from 'next/link';
-import { blogsDb } from './data';
+import { db } from '../db';
+import { blogs } from '../db/schema';
+import { desc, ilike } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
 interface BlogsPageProps {
-  // В актуальных версиях Next.js searchParams — это Promise
   searchParams: Promise<{ filter?: string }>;
 }
 
 export default async function BlogsPage({ searchParams }: BlogsPageProps) {
-  // Дожидаемся разрешения Promise для параметров строки запроса
   const resolvedSearchParams = await searchParams;
   const filterQuery = resolvedSearchParams.filter || '';
 
-  // 1. Сначала фильтруем по заголовку (без учета регистра), если параметр передан
-  const filteredBlogs = blogsDb.filter((blog) =>
-    blog.title.toLowerCase().includes(filterQuery.toLowerCase())
-  );
-
-  // 2. Затем сортируем отфильтрованный список по убыванию количества лайков
-  const sortedBlogs = filteredBlogs.slice().sort((a, b) => b.likes - a.likes);
+  // Запрашиваем блоги из БД с фильтрацией по заголовку и сортировкой по убыванию лайков
+  const allBlogs = await db
+    .select()
+    .from(blogs)
+    .where(ilike(blogs.title, `%${filterQuery}%`))
+    .orderBy(desc(blogs.likes));
 
   return (
     <div className="space-y-6">
@@ -34,12 +33,11 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
         </Link>
       </div>
 
-      {/* Нативная форма поиска. Метод GET автоматически подставит name в URL */}
       <form method="GET" action="/blogs" className="flex gap-2 max-w-md">
         <input
           type="text"
           name="filter"
-          defaultValue={filterQuery} // Сохраняем текст в инпуте при перезагрузке
+          defaultValue={filterQuery}
           placeholder="Filter blogs by title..."
           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
         />
@@ -59,12 +57,11 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
         )}
       </form>
       
-      {/* Список отфильтрованных блогов */}
       <div className="space-y-4">
-        {sortedBlogs.length === 0 ? (
+        {allBlogs.length === 0 ? (
           <p className="text-gray-500 italic">No blogs found matching "{filterQuery}"</p>
         ) : (
-          sortedBlogs.map((blog) => (
+          allBlogs.map((blog) => (
             <div 
               key={blog.id} 
               className="p-5 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-indigo-100 hover:shadow-md transition"
