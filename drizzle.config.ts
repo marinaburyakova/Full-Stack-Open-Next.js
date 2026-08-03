@@ -2,7 +2,6 @@
 import { defineConfig } from 'drizzle-kit';
 import * as dotenv from 'dotenv';
 
-// Загружаем переменную DATABASE_URL из локального файла окружения
 dotenv.config({ path: '.env.local' });
 
 export default defineConfig({

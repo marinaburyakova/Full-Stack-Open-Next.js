@@ -4,11 +4,19 @@ import postgres from 'postgres';
 import * as schema from './schema';
 
 const connectionString = process.env.DATABASE_URL;
+const isBuilding = process.env.NEXT_PHASE === 'phase-production-build';
 
-if (!connectionString) {
-  throw new Error('DATABASE_URL is not set in environment variables');
+if (!connectionString && !isBuilding) {
+  throw new Error('DATABASE_URL is missing in runtime! Please check Render Environment variables.');
 }
 
-// Для Next.js в режиме разработки предотвращаем создание множественных соединений при Hot Reload
-const client = postgres(connectionString, { max: 1 });
+const finalConnectionString = connectionString || 'postgresql://localhost:5432/fake';
+
+const client = postgres(finalConnectionString, { 
+  max: isBuilding ? 1 : 10, 
+  connect_timeout: isBuilding ? 1 : 15,
+  // Включаем обязательную поддержку SSL для защиты соединений с Render
+  ssl: isBuilding ? false : 'require' 
+});
+
 export const db = drizzle(client, { schema });
