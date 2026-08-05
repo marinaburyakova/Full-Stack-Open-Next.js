@@ -1,7 +1,9 @@
+// app/login/page.tsx
 'use client';
 
 import { useActionState } from 'react';
-import { loginUser, LoginActionState } from '../auth/loginAction';
+// ИМПОРТИРУЕМ ИСПРАВЛЕННОЕ ДЕЙСТВИЕ НАПРЯМУЮ ИЗ АУТЕНТИФИКАЦИИ
+import { loginUserAction, LoginActionState } from '../../auth'; 
 import Link from 'next/link';
 
 const initialState: LoginActionState = {
@@ -12,7 +14,8 @@ const initialState: LoginActionState = {
 };
 
 export default function LoginPage() {
-  const [state, formAction, isPending] = useActionState(loginUser, initialState);
+  // Передаем новое действие в хук
+  const [state, formAction, isPending] = useActionState(loginUserAction, initialState);
 
   return (
     <div className="max-w-md mx-auto space-y-6 mt-12">
@@ -23,7 +26,6 @@ export default function LoginPage() {
 
       <form action={formAction} className="space-y-4 bg-white p-6 border border-slate-200 rounded-2xl shadow-xs">
         
-        {/* Отображение ошибки авторизации */}
         {state.error && (
           <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 text-sm font-medium rounded-xl">
             ⚠️ {state.error}

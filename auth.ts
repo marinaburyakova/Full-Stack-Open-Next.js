@@ -75,3 +75,53 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   secret: process.env.AUTH_SECRET,
 });
+
+// --- ЭТАЛОННАЯ ОБЕРТКА ДЛЯ ВХОДА (ПАТТЕРН AUTH.JS V5) ---
+export interface LoginActionState {
+  error?: string;
+  fields?: {
+    username: string;
+  };
+}
+
+export async function loginUserAction(
+  prevState: LoginActionState,
+  formData: FormData
+): Promise<LoginActionState> {
+  'use server'; // Явно указываем, что это Server Action
+
+  const username = formData.get('username') as string;
+  const password = formData.get('password') as string;
+  const currentFields = { username };
+
+  if (!username || !password) {
+    return { error: 'Username and password are required', fields: currentFields };
+  }
+
+  try {
+    // Вызываем signIn напрямую из контекста NextAuth
+    await signIn('credentials', {
+      username,
+      password,
+      redirectTo: '/blogs',
+    });
+  } catch (rawError) {
+    const error = rawError as Error;
+
+    // Критически важно для Next.js: пропускаем ошибку редиректа дальше
+    if (error.message && error.message.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
+
+    if (
+      error.message && 
+      (error.message.includes('CredentialsSignin') || error.message.includes('CallbackRouteError'))
+    ) {
+      return { error: 'Invalid username or password', fields: currentFields };
+    }
+
+    return { error: 'Something went wrong during login.', fields: currentFields };
+  }
+
+  return {};
+}
