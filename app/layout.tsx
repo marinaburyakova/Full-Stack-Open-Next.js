@@ -1,7 +1,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { auth } from '@/auth';
+import { auth } from '../auth';
 import { logoutUser } from './auth/meActions'; // Импортируем действие логаута
 import { NotificationProvider } from './context/NotificationContext';
 import './globals.css';
