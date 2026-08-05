@@ -1,4 +1,4 @@
-
+// app/layout.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { auth } from '../auth';
@@ -17,11 +17,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   let session = null;
-  try {
-    session = await auth();
-  } catch (error) {
-    console.log(error)
-    console.warn("NextAuth session is skipped during production compile phase.");
+
+  // БЕЗОПАСНАЯ ПРОВЕРКА: предотвращаем падение, если сборщик Next.js 
+  // еще не инициализировал корневой экспорт auth из auth.ts
+  if (typeof auth === 'function') {
+    try {
+      session = await auth();
+    } catch (error) {
+      console.log("NextAuth error caught during initialization:", error);
+      console.warn("NextAuth session is skipped during production compile phase.");
+    }
   }
 
   return (

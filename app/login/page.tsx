@@ -3,50 +3,49 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react'; // ИМПОРТИРУЕМ СТРОГО КЛИЕНТСКИЙ МЕТОД
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsPending(true);
+// Внутри app/login/page.tsx найди и замени функцию handleSubmit:
 
-    if (!username || !password) {
-      setError('Username and password are required');
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError(null);
+  setIsPending(true);
+
+  if (!username || !password) {
+    setError('Username and password are required');
+    setIsPending(false);
+    return;
+  }
+
+  try {
+    // Включаем redirect: false, чтобы NextAuth НЕ управлял редиректом сам
+    const result = await signIn('credentials', {
+      username,
+      password,
+      redirect: false, 
+    });
+
+    if (result?.error) {
+      setError('Invalid username or password');
       setIsPending(false);
-      return;
+    } else {
+      // Локально перенаправляем средствами Next.js на страницу блогов
+      window.location.href = '/blogs';
     }
+  } catch (err) {
+    console.error('Login client error:', err);
+    setError('Invalid username or password');
+    setIsPending(false);
+  }
+};
 
-    try {
-      // Вызываем клиентский метод входа NextAuth
-      const result = await signIn('credentials', {
-        username,
-        password,
-        redirect: false, // Отключаем автоматический жесткий редирект, чтобы обработать ошибку вручную
-      });
-
-      if (result?.error) {
-        // Если NextAuth вернул ошибку авторизации
-        setError('Invalid username or password');
-      } else {
-        // Если всё успешно, делаем мягкий переход на страницу блогов и обновляем роутер
-        router.push('/blogs');
-        router.refresh();
-      }
-    } catch (err) {
-      console.error('Login client error:', err);
-      setError('Something went wrong during login.');
-    } finally {
-      setIsPending(false);
-    }
-  };
 
   return (
     <div className="max-w-md mx-auto space-y-6 mt-12">
