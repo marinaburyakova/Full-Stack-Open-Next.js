@@ -1,4 +1,4 @@
-// auth.ts
+// auth.ts (в корне проекта)
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { db } from './app/db';
@@ -23,7 +23,13 @@ declare module "next-auth/jwt" {
   }
 }
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+// ИСПРАВЛЕННЫЙ ЭКСПОРТ (Извлекаем handlers отдельно, чтобы не ломать компилятор):
+export const { 
+  auth, 
+  signIn, 
+  signOut, 
+  handlers: { GET, POST } 
+} = NextAuth({
   providers: [
     Credentials({
       credentials: {
@@ -31,49 +37,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) {
-          console.log("LOG: Пустые учетные данные при входе");
-          return null;
-        }
+        if (!credentials?.username || !credentials?.password) return null;
 
-        console.log(`LOG: Попытка входа для пользователя: ${credentials.username}`);
-
-        // Ищем пользователя в БД по username
         const [user] = await db
           .select()
           .from(users)
           .where(eq(users.username, credentials.username as string))
           .limit(1);
 
-        if (!user) {
-          console.log(`LOG: Пользователь ${credentials.username} НЕ найден в базе данных!`);
-          return null;
-        }
+        if (!user || !user.passwordHash) return null;
 
-        console.log(`LOG: Пользователь найден. Его имя: ${user.name}. Проверяю хэш пароля...`);
-
-        if (!user.passwordHash) {
-          console.log("LOG: У пользователя отсутствует passwordHash в базе!");
-          return null;
-        }
-
-        // Проверяем соответствие введенного пароля и хеша в БД
         const passwordMatch = await bcrypt.compare(
           credentials.password as string,
           user.passwordHash
         );
 
-        if (!passwordMatch) {
-          console.log("LOG: КРИТИЧЕСКАЯ ОШИБКА: bcrypt.compare вернул false! Пароль не совпал.");
-          return null;
-        }
-
-        console.log("LOG: 🎉 УСПЕХ: Пароли совпали! Создаю сессию для пользователя.");
+        if (!passwordMatch) return null;
 
         return {
           id: user.id,
           name: user.name,
-          email: user.username, 
+          email: user.username,
         };
       },
     }),

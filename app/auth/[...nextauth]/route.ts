@@ -1,5 +1,5 @@
+// app/api/auth/[...nextauth]/route.ts
 
-import { handlers } from "@/auth";
-
-export const GET = (req: Request) => handlers.GET(req);
-export const POST = (req: Request) => handlers.POST(req);
+// Экспортируем методы GET и POST напрямую из корневого файла конфигурации auth.ts
+// Четыре пары точек поднимают компилятор на нужный уровень папок
+export { GET, POST } from "../../../auth";
