@@ -6,7 +6,6 @@ import { eq } from 'drizzle-orm';
 import { users } from './app/db/schema';
 import bcrypt from 'bcryptjs';
 
-// --- ЭТОТ БЛОК ДЛЯ РАСШИРЕНИЯ ТИПОВ NEXTAUTH ---
 declare module "next-auth" {
   interface Session {
     user: {
@@ -23,7 +22,6 @@ declare module "next-auth/jwt" {
     id?: string;
   }
 }
-// ----------------------------------------------------
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -35,16 +33,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) return null;
 
-        // Ищем пользователя в БД по username
         const [user] = await db
           .select()
           .from(users)
           .where(eq(users.username, credentials.username as string))
           .limit(1);
 
-        if (!user) return null;
+        if (!user || !user.passwordHash) return null;
 
-        // Проверяем соответствие введенного пароля и хеша в БД
         const passwordMatch = await bcrypt.compare(
           credentials.password as string,
           user.passwordHash
@@ -52,16 +48,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!passwordMatch) return null;
 
-        // Возвращаем объект пользователя для сессии
         return {
           id: user.id,
           name: user.name,
-          email: user.username, // NextAuth ожидает email, запишем туда username для удобства
+          email: user.username,
         };
       },
     }),
   ],
-  // Расширяем JWT-токен и сессию, чтобы ID пользователя был доступен в компонентах
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -70,14 +64,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token.id) {
         session.user.id = token.id as string;
       }
       return session;
     },
   },
   pages: {
-    signIn: '/login', // Ссылка на кастомную страницу логина (создадим далее)
+    signIn: '/login',
   },
   secret: process.env.AUTH_SECRET,
 });
