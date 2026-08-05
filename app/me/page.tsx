@@ -1,24 +1,28 @@
-
-import { auth } from '@/auth';
+// app/me/page.tsx
+import { auth } from '../../auth';
 import { redirect } from 'next/navigation';
 import { db } from '../db';
 import { users } from '../db/schema';
 import { eq } from 'drizzle-orm';
-import { generateApiToken } from '../auth/meActions';
+import { generateApiToken } from '../api/auth/meActions';
 
 export const dynamic = 'force-dynamic';
 
 export default async function MePage() {
   const session = await auth();
 
-  // Защита роута: если сессии нет, отправляем на вход
   if (!session?.user?.id) {
     redirect('/login');
   }
 
-  // Получаем свежие данные пользователя из БД (включая его токен)
+  // Явно указываем, какие поля выбирать
   const [dbUser] = await db
-    .select()
+    .select({
+      id: users.id,
+      name: users.name,
+      username: users.username,
+      apiToken: users.apiToken,
+    })
     .from(users)
     .where(eq(users.id, session.user.id))
     .limit(1);
@@ -34,15 +38,14 @@ export default async function MePage() {
         <div className="border-t border-slate-100 pt-6 space-y-4">
           <div className="grid grid-cols-3 gap-4 text-sm py-2 border-b border-slate-50">
             <span className="text-slate-400 font-medium">Full Name</span>
-            <span className="col-span-2 text-slate-800 font-semibold">{dbUser?.name}</span>
+            <span className="col-span-2 text-slate-800 font-semibold">{dbUser?.name || session.user.name}</span>
           </div>
           <div className="grid grid-cols-3 gap-4 text-sm py-2 border-b border-slate-50">
             <span className="text-slate-400 font-medium">Username</span>
-            <span className="col-span-2 text-slate-600 font-mono">@{dbUser?.username}</span>
+            <span className="col-span-2 text-slate-600 font-mono">@{dbUser?.username || session.user.email}</span>
           </div>
         </div>
 
-        {/* Секция управления API токеном */}
         <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-5 space-y-4">
           <div>
             <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Personal API Token</h3>
@@ -57,13 +60,12 @@ export default async function MePage() {
             )}
           </div>
 
-          {/* Форма с кнопкой генерации, которая вызывает Server Action */}
           <form action={generateApiToken}>
             <button
               type="submit"
               className="px-4 py-2 bg-slate-900 text-white text-xs font-semibold rounded-lg hover:bg-slate-800 transition cursor-pointer"
             >
-              {dbUser?.apiToken ? 'Regenerate Token' : 'Generate New Token'}
+              {dbUser?.apiToken ? '🔄 Regenerate Token' : '⚡ Generate New Token'}
             </button>
           </form>
         </div>

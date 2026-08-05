@@ -1,37 +1,24 @@
-import { pgTable, uuid, text, integer } from 'drizzle-orm/pg-core'
-import { relations } from 'drizzle-orm'
+// app/db/schema.ts
+import { pgTable, uuid, text, varchar, integer } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
 
-// 1. Создаем таблицу пользователей
 export const users = pgTable('users', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  username: text('username').notNull().unique(),
-  name: text('name').notNull(),
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: text('name'),
+  username: varchar('username', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   apiToken: text('api_token'),
+  // Убираем createdAt, если его нет в базе данных
+  // createdAt: timestamp('created_at').defaultNow(),
 })
 
-// 2. Таблица блогов с внешним ключом
 export const blogs = pgTable('blogs', {
-  id: uuid('id').defaultRandom().primaryKey(),
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   title: text('title').notNull(),
   author: text('author').notNull(),
-  url: text('url').notNull(),
-  likes: integer('likes').default(0).notNull(),
+  url: text('url'),
+  likes: integer('likes').default(0),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
 })
-
-// 3. Описываем реляционные связи
-export const usersRelations = relations(users, ({ many }) => ({
-  blogs: many(blogs),
-}))
-
-export const blogsRelations = relations(blogs, ({ one }) => ({
-  user: one(users, {
-    fields: [blogs.userId],
-    references: [users.id],
-  }),
-}))
-
-// Экспортируем типы для TypeScript
-export type User = typeof users.$inferSelect
-export type Blog = typeof blogs.$inferSelect

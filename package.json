@@ -8,14 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
+    "@auth/core": "^0.37.2",
+    "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.45.2",
     "next": "16.2.12",
-    "next-auth": "^4.24.15",
-    "postcss": "^8.5.25",
+    "next-auth": "^5.0.0-beta.32",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
@@ -31,6 +32,6 @@
     "eslint-config-next": "16.2.12",
     "postgres": "^3.4.9",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5"
+    "typescript": "^5.3.0"
   }
 }
