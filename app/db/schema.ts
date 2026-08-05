@@ -1,5 +1,13 @@
 // app/db/schema.ts
-import { pgTable, uuid, text, varchar, integer } from 'drizzle-orm/pg-core'
+import {
+  pgTable,
+  uuid,
+  text,
+  varchar,
+  integer,
+  timestamp,
+  boolean,
+} from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 export const users = pgTable('users', {
@@ -10,8 +18,6 @@ export const users = pgTable('users', {
   username: varchar('username', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
   apiToken: text('api_token'),
-  // Убираем createdAt, если его нет в базе данных
-  // createdAt: timestamp('created_at').defaultNow(),
 })
 
 export const blogs = pgTable('blogs', {
@@ -21,4 +27,17 @@ export const blogs = pgTable('blogs', {
   url: text('url'),
   likes: integer('likes').default(0),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+})
+
+// Таблица для списка чтения
+export const readingList = pgTable('reading_list', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  blogId: integer('blog_id')
+    .notNull()
+    .references(() => blogs.id, { onDelete: 'cascade' }),
+  addedAt: timestamp('added_at').defaultNow().notNull(),
+  isRead: boolean('is_read').default(false),
 })

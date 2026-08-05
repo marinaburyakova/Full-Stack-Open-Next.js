@@ -3,7 +3,7 @@
 
 import { auth } from '../../auth';
 import { db } from '../db';
-import { blogs } from '../db/schema';
+import { blogs, readingList } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -21,11 +21,16 @@ export type ActionState = {
 };
 
 function normalizeUrl(url: string): string | null {
-  if (!url || url.trim().length === 0) return null;
+  if (!url || url.trim().length === 0) {
+    return null;
+  }
+
   let normalizedUrl = url.trim();
+
   if (!/^https?:\/\//i.test(normalizedUrl)) {
     normalizedUrl = `https://${normalizedUrl}`;
   }
+
   try {
     new URL(normalizedUrl);
     return normalizedUrl;
@@ -39,7 +44,9 @@ export async function createBlog(prevState: ActionState, formData: FormData): Pr
 
   if (!session?.user?.id) {
     return {
-      errors: { _form: ['You must be logged in to create a blog'] },
+      errors: {
+        _form: ['You must be logged in to create a blog'],
+      },
       success: false,
     };
   }
@@ -50,9 +57,15 @@ export async function createBlog(prevState: ActionState, formData: FormData): Pr
 
   const errors: ActionState['errors'] = {};
 
-  if (!title?.trim()) errors.title = ['Title is required'];
-  if (!author?.trim()) errors.author = ['Author is required'];
-  if (url?.trim()) {
+  if (!title || title.trim().length === 0) {
+    errors.title = ['Title is required'];
+  }
+
+  if (!author || author.trim().length === 0) {
+    errors.author = ['Author is required'];
+  }
+
+  if (url && url.trim().length > 0) {
     const normalizedUrl = normalizeUrl(url);
     if (!normalizedUrl) {
       errors.url = ['Please enter a valid URL (e.g., https://example.com)'];
@@ -60,29 +73,43 @@ export async function createBlog(prevState: ActionState, formData: FormData): Pr
   }
 
   if (Object.keys(errors).length > 0) {
-    return { errors, success: false };
+    return {
+      errors,
+      success: false,
+    };
   }
 
   try {
     const normalizedUrl = url ? normalizeUrl(url) : null;
 
-    // ✅ БЕЗ as any! Тип правильный
-    await db.insert(blogs).values({
-      title: title.trim(),
-      author: author.trim(),
-      url: normalizedUrl,
-      userId: session.user.id, // UUID как строка
-    });
+    const [newBlog] = await db
+      .insert(blogs)
+      .values({
+        title: title.trim(),
+        author: author.trim(),
+        url: normalizedUrl,
+        userId: session.user.id,
+      })
+      .returning();
+
+    if (newBlog) {
+      await db.insert(readingList).values({
+        userId: session.user.id,
+        blogId: newBlog.id,
+      });
+    }
 
     revalidatePath('/blogs');
     return {
       success: true,
-      message: 'Blog created successfully!',
+      message: 'Blog created successfully and added to your reading list!',
     };
   } catch (error) {
     console.error('Create blog error:', error);
     return {
-      errors: { _form: ['Failed to create blog. Please try again.'] },
+      errors: {
+        _form: ['Failed to create blog. Please try again.'],
+      },
       success: false,
     };
   }
@@ -90,13 +117,22 @@ export async function createBlog(prevState: ActionState, formData: FormData): Pr
 
 export async function likeBlog(formData: FormData) {
   const session = await auth();
-  if (!session?.user?.id) redirect('/login');
+
+  if (!session?.user?.id) {
+    redirect('/login');
+  }
 
   const idString = formData.get('id') as string;
-  if (!idString) throw new Error('Blog ID is required');
+
+  if (!idString) {
+    throw new Error('Blog ID is required');
+  }
 
   const id = parseInt(idString, 10);
-  if (isNaN(id)) throw new Error('Invalid blog ID');
+
+  if (isNaN(id)) {
+    throw new Error('Invalid blog ID');
+  }
 
   await db
     .update(blogs)
@@ -109,13 +145,22 @@ export async function likeBlog(formData: FormData) {
 
 export async function deleteBlog(formData: FormData) {
   const session = await auth();
-  if (!session?.user?.id) redirect('/login');
+
+  if (!session?.user?.id) {
+    redirect('/login');
+  }
 
   const idString = formData.get('id') as string;
-  if (!idString) throw new Error('Blog ID is required');
+
+  if (!idString) {
+    throw new Error('Blog ID is required');
+  }
 
   const id = parseInt(idString, 10);
-  if (isNaN(id)) throw new Error('Invalid blog ID');
+
+  if (isNaN(id)) {
+    throw new Error('Invalid blog ID');
+  }
 
   const [blog] = await db
     .select()
@@ -123,21 +168,33 @@ export async function deleteBlog(formData: FormData) {
     .where(eq(blogs.id, id))
     .limit(1);
 
-  if (!blog) throw new Error('Blog not found');
+  if (!blog) {
+    throw new Error('Blog not found');
+  }
 
-  // ✅ Сравниваем UUID как строки
+  // ✅ Исправлено: сравниваем UUID как строки
   if (blog.userId !== session.user.id) {
     throw new Error('You are not authorized to delete this blog');
   }
 
+  // Удаляем из списка чтения
+  await db
+    .delete(readingList)
+    .where(eq(readingList.blogId, id));
+
+  // Удаляем блог
   await db.delete(blogs).where(eq(blogs.id, id));
+
   revalidatePath('/blogs');
   redirect('/blogs');
 }
 
 export async function updateBlog(formData: FormData) {
   const session = await auth();
-  if (!session?.user?.id) redirect('/login');
+
+  if (!session?.user?.id) {
+    redirect('/login');
+  }
 
   const idString = formData.get('id') as string;
   const title = formData.get('title') as string;
@@ -149,7 +206,10 @@ export async function updateBlog(formData: FormData) {
   }
 
   const id = parseInt(idString, 10);
-  if (isNaN(id)) throw new Error('Invalid blog ID');
+
+  if (isNaN(id)) {
+    throw new Error('Invalid blog ID');
+  }
 
   const [blog] = await db
     .select()
@@ -157,9 +217,11 @@ export async function updateBlog(formData: FormData) {
     .where(eq(blogs.id, id))
     .limit(1);
 
-  if (!blog) throw new Error('Blog not found');
+  if (!blog) {
+    throw new Error('Blog not found');
+  }
 
-  // ✅ Сравниваем UUID как строки
+  // ✅ Исправлено: сравниваем UUID как строки
   if (blog.userId !== session.user.id) {
     throw new Error('You are not authorized to update this blog');
   }
