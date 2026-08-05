@@ -24,28 +24,33 @@ export async function loginUser(
   }
 
   try {
-    // Вызываем авторизацию NextAuth по логину и паролю
+    // Запускаем авторизацию по логину и паролю
     await signIn('credentials', {
       username,
       password,
-      redirectTo: '/blogs', // Куда отправить пользователя после успешного входа
+      redirectTo: '/blogs', 
     });
   } catch (rawError) {
-    // Приводим ошибку к типу Error, чтобы TypeScript разрешил читать message
     const error = rawError as Error;
 
-    // В NextAuth перенаправление (redirect) работает через проброс специальной ошибки.
-    // Если это ошибка редиректа — просто пробрасываем её дальше, NextAuth сам всё сделает.
+    // ОБЯЗАТЕЛЬНО: Если NextAuth делает успешный редирект, пробрасываем ошибку дальше!
     if (error.message && error.message.includes('NEXT_REDIRECT')) {
       throw error;
     }
 
-    // Обрабатываем ошибку неверных учетных данных (CredentialsSignin)
-    if (error.message && error.message.includes('CredentialsSignin')) {
+    // ЛОГ ДЛЯ ТЕБЯ: выведет точную ошибку в терминал VS Code, если ты тестируешь локально
+    console.error("NextAuth Login Error Caught:", error.name, error.message);
+
+    // Ловим ЛЮБУЮ ошибку учетных данных (CredentialsSignin или ошибку коллбэка CallbackRouteError)
+    if (
+      error.message && 
+      (error.message.includes('CredentialsSignin') || error.message.includes('CallbackRouteError'))
+    ) {
       return { error: 'Invalid username or password', fields: currentFields };
     }
 
-    return { error: 'Something went wrong during login.', fields: currentFields };
+    // Если база данных упала или что-то еще
+    return { error: `Login failed: ${error.message || 'Unknown error'}`, fields: currentFields };
   }
 
   return {};
