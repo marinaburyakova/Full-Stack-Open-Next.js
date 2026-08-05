@@ -1,20 +1,52 @@
-
+// app/login/page.tsx
 'use client';
 
-import { useActionState } from 'react';
-// Импортируем действие и тип состояния из файла изолированных серверных экшенов
-import { loginUserAction, LoginActionState } from '../auth/actions'; 
+import { useState } from 'react';
+import { signIn } from 'next-auth/react'; // ИМПОРТИРУЕМ СТРОГО КЛИЕНТСКИЙ МЕТОД
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-const initialState: LoginActionState = {
-  error: undefined,
-  fields: {
-    username: '',
-  },
-};
-
 export default function LoginPage() {
-  const [state, formAction, isPending] = useActionState(loginUserAction, initialState);
+  const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsPending(true);
+
+    if (!username || !password) {
+      setError('Username and password are required');
+      setIsPending(false);
+      return;
+    }
+
+    try {
+      // Вызываем клиентский метод входа NextAuth
+      const result = await signIn('credentials', {
+        username,
+        password,
+        redirect: false, // Отключаем автоматический жесткий редирект, чтобы обработать ошибку вручную
+      });
+
+      if (result?.error) {
+        // Если NextAuth вернул ошибку авторизации
+        setError('Invalid username or password');
+      } else {
+        // Если всё успешно, делаем мягкий переход на страницу блогов и обновляем роутер
+        router.push('/blogs');
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Login client error:', err);
+      setError('Something went wrong during login.');
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto space-y-6 mt-12">
@@ -23,11 +55,13 @@ export default function LoginPage() {
         <p className="text-slate-500 mt-2">Log in to manage and share your blogs</p>
       </div>
 
-      <form action={formAction} className="space-y-4 bg-white p-6 border border-slate-200 rounded-2xl shadow-xs">
+      {/* Обычная форма с обработчиком onSubmit */}
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 border border-slate-200 rounded-2xl shadow-xs">
         
-        {state.error && (
+        {/* Отображение ошибки */}
+        {error && (
           <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 text-sm font-medium rounded-xl">
-            ⚠️ {state.error}
+            ⚠️ {error}
           </div>
         )}
 
@@ -38,8 +72,8 @@ export default function LoginPage() {
           <input
             type="text"
             id="username"
-            name="username"
-            defaultValue={state.fields?.username}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             disabled={isPending}
             required
             placeholder="mluukkai"
@@ -54,7 +88,8 @@ export default function LoginPage() {
           <input
             type="password"
             id="password"
-            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             disabled={isPending}
             required
             placeholder="••••••••"

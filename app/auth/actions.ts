@@ -6,8 +6,6 @@ import { db } from '../db';
 import { users } from '../db/schema';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
-import { signIn } from '../../auth'; // Импортируем строго из чистого auth.ts
-
 // --- ТИПЫ И ЭКШЕН ДЛЯ РЕГИСТРАЦИИ (Упражнение 12 & 15) ---
 export interface RegisterActionState {
   error?: string;
@@ -68,56 +66,3 @@ export async function registerUser(
   redirect('/login');
 }
 
-// --- ДОБАВЛЕННЫЙ ИНТЕРФЕЙС СОСТОЯНИЯ ДЛЯ ВХОДА (ФИКС ОШИБКИ) ---
-export interface LoginActionState {
-  error?: string;
-  fields?: {
-    username: string;
-  };
-}
-
-export async function loginUserAction(
-  prevState: LoginActionState,
-  formData: FormData
-): Promise<LoginActionState> {
-  const username = formData.get('username') as string;
-  const password = formData.get('password') as string;
-  const currentFields = { username };
-
-  if (!username || !password) {
-    return { error: 'Username and password are required', fields: currentFields };
-  }
-
-  try {
-    // Вызываем метод signIn
-    await signIn('credentials', {
-      username,
-      password,
-      redirectTo: '/blogs',
-    });
-  } catch (rawError) {
-    const error = rawError as Error;
-
-    // ВАЖНО: Если NextAuth делает успешный редирект, мы ОБЯЗАНЫ пробросить его дальше!
-    if (error.message && error.message.includes('NEXT_REDIRECT')) {
-      throw error;
-    }
-
-    console.error("NextAuth Signin Error Log:", error.name, error.message);
-
-    // Ловим ЛЮБЫЕ ошибки неверных данных (CredentialsSignin, CallbackRouteError и т.д.)
-    if (
-      error.message && 
-      (error.message.includes('CredentialsSignin') || 
-       error.message.includes('CallbackRouteError') || 
-       error.name === 'CredentialsSignin')
-    ) {
-      return { error: 'Invalid username or password', fields: currentFields };
-    }
-
-    // Если произошел сбой из-за чего-то другого
-    return { error: 'Invalid username or password', fields: currentFields };
-  }
-
-  return {};
-}
