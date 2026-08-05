@@ -7,6 +7,7 @@ export const users = pgTable('users', {
   username: text('username').notNull().unique(),
   name: text('name').notNull(),
   passwordHash: text('password_hash').notNull(),
+  apiToken: text('api_token'),
 })
 
 // 2. Таблица блогов с внешним ключом
