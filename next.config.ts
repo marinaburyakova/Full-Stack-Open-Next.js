@@ -1,10 +1,10 @@
-import type { NextConfig } from 'next'
+// next.config.ts
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    // Указывает Turbopack искать файлы только внутри папки проекта
-    root: __dirname, 
-  },
-}
+  /* Здесь можно оставить файл абсолютно чистым. 
+     Next.js сам автоматически и правильно определит корень 
+     как на твоем компьютере, так и в облаке Render. */
+};
 
-export default nextConfig
+export default nextConfig;

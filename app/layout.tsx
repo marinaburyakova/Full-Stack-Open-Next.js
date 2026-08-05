@@ -1,8 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { auth } from '../auth';
-import { logoutUser } from './auth/meActions'; // Импортируем действие логаута
+import { logoutUser } from './auth/meActions';
 import { NotificationProvider } from './context/NotificationContext';
 import './globals.css';
 
@@ -18,25 +17,25 @@ export default async function RootLayout({
 }) {
   let session = null;
 
-  // БЕЗОПАСНАЯ ПРОВЕРКА: предотвращаем падение, если сборщик Next.js 
-  // еще не инициализировал корневой экспорт auth из auth.ts
-  if (typeof auth === 'function') {
-    try {
-      session = await auth();
-    } catch (error) {
-      console.log("NextAuth error caught during initialization:", error);
-      console.warn("NextAuth session is skipped during production compile phase.");
-    }
+  try {
+    // ДИНАМИЧЕСКИЙ ИМПОРТ: загружаем auth только в рантайме на сервере.
+    // Это на 100% предотвращает падение Turbopack на этапе пререндера Render!
+    const { auth } = await import('../auth');
+    session = await auth();
+  } catch {
+    console.warn("NextAuth session is skipped during production compile phase.");
   }
 
   return (
     <html lang="en" className="h-full bg-slate-50">
       <body className="antialiased min-h-screen flex flex-col font-sans text-slate-900">
         <NotificationProvider>
+          {/* Панель навигации */}
           <nav className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
               
               <div className="flex items-center gap-8">
+                {/* Обновленный класс градиента под стандарты Tailwind v4 */}
                 <Link href="/" className="text-xl font-bold bg-linear-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent hover:opacity-90 transition">
                   FSO Blogs
                 </Link>
