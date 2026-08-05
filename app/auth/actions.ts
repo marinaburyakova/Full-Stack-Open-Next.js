@@ -1,4 +1,4 @@
-
+// app/auth/actions.ts
 'use server';
 
 import { redirect } from 'next/navigation';
@@ -68,7 +68,7 @@ export async function registerUser(
   redirect('/login');
 }
 
-// --- ТИПЫ И ЭКШЕН ДЛЯ ВХОДА (Упражнение 18) ---
+// --- ДОБАВЛЕННЫЙ ИНТЕРФЕЙС СОСТОЯНИЯ ДЛЯ ВХОДА (ФИКС ОШИБКИ) ---
 export interface LoginActionState {
   error?: string;
   fields?: {
@@ -98,21 +98,25 @@ export async function loginUserAction(
   } catch (rawError) {
     const error = rawError as Error;
 
-    // Пропускаем системный редирект Next.js наружу
+    // ВАЖНО: Если NextAuth делает успешный редирект, мы ОБЯЗАНЫ пробросить его дальше!
     if (error.message && error.message.includes('NEXT_REDIRECT')) {
       throw error;
     }
 
-    console.error("NextAuth Signin Error:", error.message);
+    console.error("NextAuth Signin Error Log:", error.name, error.message);
 
+    // Ловим ЛЮБЫЕ ошибки неверных данных (CredentialsSignin, CallbackRouteError и т.д.)
     if (
       error.message && 
-      (error.message.includes('CredentialsSignin') || error.message.includes('CallbackRouteError'))
+      (error.message.includes('CredentialsSignin') || 
+       error.message.includes('CallbackRouteError') || 
+       error.name === 'CredentialsSignin')
     ) {
       return { error: 'Invalid username or password', fields: currentFields };
     }
 
-    return { error: 'Something went wrong during login.', fields: currentFields };
+    // Если произошел сбой из-за чего-то другого
+    return { error: 'Invalid username or password', fields: currentFields };
   }
 
   return {};
