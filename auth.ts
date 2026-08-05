@@ -23,13 +23,8 @@ declare module "next-auth/jwt" {
   }
 }
 
-// ИСПРАВЛЕННЫЙ ЭКСПОРТ (Извлекаем handlers отдельно, чтобы не ломать компилятор):
-export const { 
-  auth, 
-  signIn, 
-  signOut, 
-  handlers: { GET, POST } 
-} = NextAuth({
+// СТАНДАРТНЫЙ ЭКСПОРТ (БЕЗ ДЕСТРУКТУРИЗАЦИИ HANDLERS ВНУТРИ)
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       credentials: {
