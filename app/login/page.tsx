@@ -1,9 +1,9 @@
-// app/login/page.tsx
+
 'use client';
 
 import { useActionState } from 'react';
-// ИМПОРТИРУЕМ ИСПРАВЛЕННОЕ ДЕЙСТВИЕ НАПРЯМУЮ ИЗ АУТЕНТИФИКАЦИИ
-import { loginUserAction, LoginActionState } from '../../auth'; 
+// Импортируем действие и тип состояния из файла изолированных серверных экшенов
+import { loginUserAction, LoginActionState } from '../auth/actions'; 
 import Link from 'next/link';
 
 const initialState: LoginActionState = {
@@ -14,7 +14,6 @@ const initialState: LoginActionState = {
 };
 
 export default function LoginPage() {
-  // Передаем новое действие в хук
   const [state, formAction, isPending] = useActionState(loginUserAction, initialState);
 
   return (

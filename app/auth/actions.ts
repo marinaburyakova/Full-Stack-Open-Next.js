@@ -1,3 +1,4 @@
+
 'use server';
 
 import { redirect } from 'next/navigation';
@@ -5,8 +6,9 @@ import { db } from '../db';
 import { users } from '../db/schema';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
+import { signIn } from '../../auth'; // Импортируем строго из чистого auth.ts
 
-// Описываем тип состояния для формы регистрации
+// --- ТИПЫ И ЭКШЕН ДЛЯ РЕГИСТРАЦИИ (Упражнение 12 & 15) ---
 export interface RegisterActionState {
   error?: string;
   fields?: {
@@ -24,31 +26,22 @@ export async function registerUser(
   const password = formData.get('password') as string;
   const passwordConfirm = formData.get('passwordConfirm') as string;
 
-  // Сохраняем имя и логин, чтобы вернуть их в инпуты (пароли из соображений безопасности не возвращаем)
   const currentFields = { name, username };
 
-  // 1. Проверка наличия всех полей
   if (!name || !username || !password || !passwordConfirm) {
     return { error: 'All fields are required', fields: currentFields };
   }
-
-  // 2. Правило: Имя пользователя должно состоять как минимум из 4 символов
   if (username.trim().length < 4) {
     return { error: 'Username must be at least 4 characters long', fields: currentFields };
   }
-
-  // 3. Правило: Пароль должен состоять как минимум из 4 символов
   if (password.length < 4) {
     return { error: 'Password must be at least 4 characters long', fields: currentFields };
   }
-
-  // 4. Правило: Значение поля passwordConfirm должно совпадать с полем password
   if (password !== passwordConfirm) {
     return { error: 'Passwords do not match', fields: currentFields };
   }
 
   try {
-    // 5. Правило: Если пользователь с указанным именем уже существует — возвращаем ошибку
     const [existingUser] = await db
       .select()
       .from(users)
@@ -59,11 +52,9 @@ export async function registerUser(
       return { error: 'Username is already taken', fields: currentFields };
     }
 
-    // Хешируем пароль
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Вставляем нового пользователя в базу данных PostgreSQL
     await db.insert(users).values({
       username,
       name,
@@ -74,6 +65,55 @@ export async function registerUser(
     return { error: 'Registration failed due to a database error.', fields: currentFields };
   }
 
-  // После успешной регистрации перенаправляем на страницу логина
   redirect('/login');
+}
+
+// --- ТИПЫ И ЭКШЕН ДЛЯ ВХОДА (Упражнение 18) ---
+export interface LoginActionState {
+  error?: string;
+  fields?: {
+    username: string;
+  };
+}
+
+export async function loginUserAction(
+  prevState: LoginActionState,
+  formData: FormData
+): Promise<LoginActionState> {
+  const username = formData.get('username') as string;
+  const password = formData.get('password') as string;
+  const currentFields = { username };
+
+  if (!username || !password) {
+    return { error: 'Username and password are required', fields: currentFields };
+  }
+
+  try {
+    // Вызываем метод signIn
+    await signIn('credentials', {
+      username,
+      password,
+      redirectTo: '/blogs',
+    });
+  } catch (rawError) {
+    const error = rawError as Error;
+
+    // Пропускаем системный редирект Next.js наружу
+    if (error.message && error.message.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
+
+    console.error("NextAuth Signin Error:", error.message);
+
+    if (
+      error.message && 
+      (error.message.includes('CredentialsSignin') || error.message.includes('CallbackRouteError'))
+    ) {
+      return { error: 'Invalid username or password', fields: currentFields };
+    }
+
+    return { error: 'Something went wrong during login.', fields: currentFields };
+  }
+
+  return {};
 }
