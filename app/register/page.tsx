@@ -1,19 +1,26 @@
-
-import { registerUser } from '@/app/api/auth/actions';
-import Link from 'next/link';
+import { registerUser } from '@/app/auth/actions'
+import Link from 'next/link'
 
 export default function RegisterPage() {
   return (
     <div className="max-w-md mx-auto space-y-6 mt-12">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-950">Create an Account</h1>
-        <p className="text-gray-500 mt-2">Sign up to start adding your own blogs</p>
+        <p className="text-gray-500 mt-2">
+          Sign up to start adding your own blogs
+        </p>
       </div>
-      
+
       {/* Нативная форма вызывает Server Action напрямую */}
-      <form action={registerUser} className="space-y-4 bg-white p-6 border border-gray-200 rounded-xl shadow-sm">
+      <form
+        action={registerUser}
+        className="space-y-4 bg-white p-6 border border-gray-200 rounded-xl shadow-sm"
+      >
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Full Name
           </label>
           <input
@@ -27,7 +34,10 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="username"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Username
           </label>
           <input
@@ -41,7 +51,10 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Password
           </label>
           <input
@@ -63,11 +76,14 @@ export default function RegisterPage() {
 
         <p className="text-sm text-gray-600 text-center mt-4">
           Already have an account?{' '}
-          <Link href="/login" className="text-indigo-600 hover:underline font-medium">
+          <Link
+            href="/login"
+            className="text-indigo-600 hover:underline font-medium"
+          >
             Log in
           </Link>
         </p>
       </form>
     </div>
-  );
+  )
 }
