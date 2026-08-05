@@ -1,3 +1,4 @@
-// app/api/auth/[...nextauth]/route.ts
-import { handlers } from "@/auth"; // Настройка import alias @/* ссылается на корень
-export const { GET, POST } = handlers;
+import { handlers } from "@/auth";
+
+export const GET = handlers.GET;
+export const POST = handlers.POST;
