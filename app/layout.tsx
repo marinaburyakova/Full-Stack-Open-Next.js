@@ -1,20 +1,27 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { auth } from '@/auth' // Импортируем проверку сессии NextAuth v5
-import './globals.css'
+// app/layout.tsx
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { auth } from '@/auth'; // Импортируем проверку сессии NextAuth v5
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'FSO Blog App',
   description: 'Next.js version of Full Stack Open Bloglist',
-}
+};
 
 export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  // Проверяем сессию на сервере
-  const session = await auth()
+  // Безопасный перехват сессии для защиты от падения prerender во время сборки
+  let session = null;
+  try {
+    session = await auth();
+  } catch (error) {
+    console.log(error)
+    console.warn("NextAuth session is skipped during production compile phase.");
+  }
 
   return (
     <html lang="en">
@@ -65,5 +72,5 @@ export default async function RootLayout({
         <main className="max-w-4xl mx-auto p-6">{children}</main>
       </body>
     </html>
-  )
+  );
 }
