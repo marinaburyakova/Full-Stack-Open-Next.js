@@ -12,16 +12,29 @@ export default function RegisterPage() {
     password: '',
     confirmPassword: '',
   });
+  const [errors, setErrors] = useState<{
+    username?: string;
+    passwordConfirm?: string;
+  }>({});
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
     setError('');
     setLoading(true);
 
+    // Проверка на короткий username
+    if (formData.username.length < 3) {
+      setErrors({ username: 'Username must be at least 3 characters' });
+      setLoading(false);
+      return;
+    }
+
+    // Проверка на совпадение паролей
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setErrors({ passwordConfirm: 'Passwords do not match' });
       setLoading(false);
       return;
     }
@@ -61,10 +74,11 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
               Name
             </label>
             <input
+              id="name"
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -75,10 +89,11 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
               Username
             </label>
             <input
+              id="username"
               type="text"
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -86,13 +101,20 @@ export default function RegisterPage() {
               required
               disabled={loading}
             />
+            {/* ✅ data-testid="username-error" */}
+            {errors.username && (
+              <p data-testid="username-error" className="mt-1 text-sm text-red-600">
+                {errors.username}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
               Password
             </label>
             <input
+              id="password"
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -104,10 +126,11 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-1">
               Confirm Password
             </label>
             <input
+              id="confirmPassword"
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
@@ -115,6 +138,12 @@ export default function RegisterPage() {
               required
               disabled={loading}
             />
+            {/* ✅ data-testid="passwordConfirm-error" */}
+            {errors.passwordConfirm && (
+              <p data-testid="passwordConfirm-error" className="mt-1 text-sm text-red-600">
+                {errors.passwordConfirm}
+              </p>
+            )}
           </div>
 
           {error && (

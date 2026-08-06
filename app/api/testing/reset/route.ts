@@ -12,10 +12,10 @@ export async function DELETE() {
   }
 
   try {
-    // ✅ Переключаемся на схему test
+    // ✅ ПЕРЕКЛЮЧАЕМСЯ НА СХЕМУ TEST
     await db.execute(sql`SET search_path TO test`);
     
-    // Удаляем данные из всех таблиц в правильном порядке
+    // Удаляем данные в правильном порядке
     await db.execute(sql`DELETE FROM "reading_list"`);
     await db.execute(sql`DELETE FROM "blogs"`);
     await db.execute(sql`DELETE FROM "users"`);
@@ -23,7 +23,7 @@ export async function DELETE() {
     // Сбрасываем счетчики
     await db.execute(sql`ALTER SEQUENCE "reading_list_id_seq" RESTART WITH 1`);
 
-    // ✅ Возвращаемся на public
+    // ✅ ВОЗВРАЩАЕМСЯ НА PUBLIC
     await db.execute(sql`SET search_path TO public`);
 
     return NextResponse.json(

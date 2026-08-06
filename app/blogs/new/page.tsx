@@ -31,8 +31,8 @@ export default function NewBlogPage() {
               Title *
             </label>
             <input
-              type="text"
               id="title"
+              type="text"
               name="title"
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="Enter blog title"
@@ -48,8 +48,8 @@ export default function NewBlogPage() {
               Author *
             </label>
             <input
-              type="text"
               id="author"
+              type="text"
               name="author"
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="Enter author name"
@@ -65,8 +65,8 @@ export default function NewBlogPage() {
               URL (optional)
             </label>
             <input
-              type="text"
               id="url"
+              type="text"
               name="url"
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="https://example.com"

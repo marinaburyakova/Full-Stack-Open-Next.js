@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    // ✅ Переключаемся на схему test
+    // ✅ ПЕРЕКЛЮЧАЕМСЯ НА СХЕМУ TEST
     await db.execute(sql`SET search_path TO test`);
 
     const body = await request.json();
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Проверяем существующего пользователя в схеме test
+    // Проверяем существующего пользователя в схеме TEST
     const [existingUser] = await db
       .select()
       .from(users)
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
         name: users.name,
       });
 
-    // ✅ Возвращаемся на public
+    // ✅ ВОЗВРАЩАЕМСЯ НА PUBLIC
     await db.execute(sql`SET search_path TO public`);
 
     return NextResponse.json(
