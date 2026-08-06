@@ -8,7 +8,7 @@ import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-// ✅ Меняем тип с number на string (UUID)
+// ✅ blogId - UUID как строка
 export async function addToReadingList(blogId: string) {
   const session = await auth();
 
@@ -17,7 +17,6 @@ export async function addToReadingList(blogId: string) {
   }
 
   try {
-    // Проверяем, есть ли уже в списке
     const [existing] = await db
       .select()
       .from(readingList)
@@ -48,7 +47,7 @@ export async function addToReadingList(blogId: string) {
   }
 }
 
-// ✅ Меняем тип с number на string (UUID)
+// ✅ Остальные функции аналогично с blogId: string
 export async function removeFromReadingList(blogId: string) {
   const session = await auth();
 
@@ -76,7 +75,6 @@ export async function removeFromReadingList(blogId: string) {
   }
 }
 
-// ✅ Меняем тип с number на string (UUID)
 export async function markAsRead(blogId: string) {
   const session = await auth();
 

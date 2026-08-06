@@ -1,0 +1,560 @@
+
+> fso-nextjs-app@0.1.0 test:e2e
+> playwright test
+
+
+Running 28 tests using 6 workers
+
+[1/28] [chromium] › tests\blog-app.spec.ts:43:9 › Blog Application › Authentication › registration fails with mismatched passwords
+[2/28] [chromium] › tests\blog-app.spec.ts:11:9 › Blog Application › Authentication › user can register
+[3/28] [chromium] › tests\blog-app.spec.ts:72:9 › Blog Application › Authentication › login fails with wrong credentials
+[4/28] [chromium] › tests\blog-app.spec.ts:84:9 › Blog Application › Authentication › logged in user can see their info
+[5/28] [chromium] › tests\blog-app.spec.ts:59:9 › Blog Application › Authentication › user can login
+[6/28] [chromium] › tests\blog-app.spec.ts:27:9 › Blog Application › Authentication › registration fails with short username
+[7/28] [chromium] › tests\blog-app.spec.ts:95:9 › Blog Application › Authentication › user can logout
+  1) [chromium] › tests\blog-app.spec.ts:84:9 › Blog Application › Authentication › logged in user can see their info 
+
+    Error: Failed to create user: 500 Internal Server Error - {"error":"Failed to create user"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:85:7
+
+    Error Context: test-results\blog-app-Blog-Application--1c6a7--in-user-can-see-their-info-chromium\error-context.md
+
+
+[8/28] [chromium] › tests\blog-app.spec.ts:112:9 › Blog Application › Navigation › home page can be opened
+[9/28] [chromium] › tests\blog-app.spec.ts:119:9 › Blog Application › Navigation › navigation links are visible for non-logged in user
+[10/28] [chromium] › tests\blog-app.spec.ts:133:9 › Blog Application › Navigation › navigation links change after login
+  2) [chromium] › tests\blog-app.spec.ts:27:9 › Blog Application › Authentication › registration fails with short username 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByTestId('username-error')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByTestId('username-error')
+
+
+      38 |
+      39 |       // Should show error message
+    > 40 |       await expect(page.getByTestId('username-error')).toBeVisible()
+         |                                                        ^
+      41 |     })
+      42 |
+      43 |     test('registration fails with mismatched passwords', async ({ page }) => {
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:40:56
+
+    Error Context: test-results\blog-app-Blog-Application--853bf-n-fails-with-short-username-chromium\error-context.md
+
+
+  3) [chromium] › tests\blog-app.spec.ts:11:9 › Blog Application › Authentication › user can register 
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected: "http://localhost:3000/login"
+    Received: "http://localhost:3000/register"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        14 × locator resolved to <html lang="en" class="h-full bg-slate-50">…</html>
+           - unexpected value "http://localhost:3000/register"
+
+
+      22 |
+      23 |       // Should redirect to login page
+    > 24 |       await expect(page).toHaveURL('/login')
+         |                          ^
+      25 |     })
+      26 |
+      27 |     test('registration fails with short username', async ({ page }) => {
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:24:26
+
+    Error Context: test-results\blog-app-Blog-Application-Authentication-user-can-register-chromium\error-context.md
+
+
+[11/28] [chromium] › tests\blog-app.spec.ts:163:9 › Blog Application › Navigation › logged in user can navigate to create blog page
+[12/28] [chromium] › tests\blog-app.spec.ts:153:9 › Blog Application › Navigation › user can navigate to blogs page
+  4) [chromium] › tests\blog-app.spec.ts:59:9 › Blog Application › Authentication › user can login ─
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected: "http://localhost:3000/"
+    Received: "http://localhost:3000/login"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        14 × locator resolved to <html lang="en" class="h-full bg-slate-50">…</html>
+           - unexpected value "http://localhost:3000/login"
+
+
+      66 |
+      67 |       // Should redirect to home page and show success notification
+    > 68 |       await expect(page).toHaveURL('/')
+         |                          ^
+      69 |       await expect(page.getByTestId('notification')).toBeVisible()
+      70 |     })
+      71 |
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:68:26
+
+    Error Context: test-results\blog-app-Blog-Application-Authentication-user-can-login-chromium\error-context.md
+
+
+[13/28] [chromium] › tests\blog-app.spec.ts:177:9 › Blog Application › Navigation › user can navigate to users page
+  5) [chromium] › tests\blog-app.spec.ts:133:9 › Blog Application › Navigation › navigation links change after login 
+
+    Error: Failed to create user: 400 Bad Request - {"error":"Username already exists"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:134:7
+
+    Error Context: test-results\blog-app-Blog-Application--af7b8-on-links-change-after-login-chromium\error-context.md
+
+
+[14/28] [chromium] › tests\blog-app.spec.ts:195:9 › Blog Application › Blogs › logged in user can create a blog
+  6) [chromium] › tests\blog-app.spec.ts:119:9 › Blog Application › Navigation › navigation links are visible for non-logged in user 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('link', { name: 'login', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByRole('link', { name: 'login', exact: true })
+
+
+      125 |       await expect(
+      126 |         page.getByRole('link', { name: 'login', exact: true }),
+    > 127 |       ).toBeVisible()
+          |         ^
+      128 |       await expect(
+      129 |         page.getByRole('link', { name: 'register', exact: true }),
+      130 |       ).toBeVisible()
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:127:9
+
+    Error Context: test-results\blog-app-Blog-Application--045ea-ible-for-non-logged-in-user-chromium\error-context.md
+
+
+[15/28] [chromium] › tests\blog-app.spec.ts:224:9 › Blog Application › Blogs › blogs are displayed on blogs page
+[16/28] [chromium] › tests\blog-app.spec.ts:214:9 › Blog Application › Blogs › user cannot create blog without being logged in
+  7) [chromium] › tests\blog-app.spec.ts:95:9 › Blog Application › Authentication › user can logout 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('link', { name: 'login', exact: true })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByRole('link', { name: 'login', exact: true })
+
+
+      105 |       await expect(
+      106 |         page.getByRole('link', { name: 'login', exact: true }),
+    > 107 |       ).toBeVisible()
+          |         ^
+      108 |     })
+      109 |   })
+      110 |
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:107:9
+
+    Error Context: test-results\blog-app-Blog-Application-Authentication-user-can-logout-chromium\error-context.md
+
+
+[17/28] [chromium] › tests\blog-app.spec.ts:239:9 › Blog Application › Blogs › blog can be viewed individually
+  8) [chromium] › tests\blog-app.spec.ts:224:9 › Blog Application › Blogs › blogs are displayed on blogs page 
+
+    Error: Failed to create user: 400 Bad Request - {"error":"Username already exists"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:192:7
+
+    Error Context: test-results\blog-app-Blog-Application--6ec97-are-displayed-on-blogs-page-chromium\error-context.md
+
+
+  9) [chromium] › tests\blog-app.spec.ts:214:9 › Blog Application › Blogs › user cannot create blog without being logged in 
+
+    Error: Failed to create user: 400 Bad Request - {"error":"Username already exists"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:192:7
+
+    Error Context: test-results\blog-app-Blog-Application--c4403-log-without-being-logged-in-chromium\error-context.md
+
+
+Assertion failed: !
+
+(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 76
+
+
+[18/28] [chromium] › tests\blog-app.spec.ts:256:9 › Blog Application › Blogs › blogs can be filtered
+  10) [chromium] › tests\blog-app.spec.ts:239:9 › Blog Application › Blogs › blog can be viewed individually 
+
+    Error: Failed to create user: 400 Bad Request - {"error":"Username already exists"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:192:7
+
+    Error Context: test-results\blog-app-Blog-Application--83794--can-be-viewed-individually-chromium\error-context.md
+
+
+[19/28] [chromium] › tests\blog-app.spec.ts:288:9 › Blog Application › Blogs › blog shows like count
+Assertion faile
+
+d: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 76
+
+
+[20/28] [chromium] › tests\blog-app.spec.ts:305:9 › Blog Application › Me Page › redirects to login if not authenticated
+  11) [chromium] › tests\blog-app.spec.ts:305:9 › Blog Application › Me Page › redirects to login if not authenticated 
+
+    Error: Failed to create user: 400 Bad Request - {"error":"Username already exists"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:302:7
+
+    Error Context: test-results\blog-app-Blog-Application--0d588--login-if-not-authenticated-chromium\error-context.md
+
+
+Assertion failed: !(handle->flags
+
+ & UV_HANDLE_CLOSING), file src\win\async.c, line 76
+
+
+  12) [chromium] › tests\blog-app.spec.ts:288:9 › Blog Application › Blogs › blog shows like count ─
+
+    Error: Failed to create user: 500 Internal Server Error - {"error":"Failed to create user"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:192:7
+
+    Error Context: test-results\blog-app-Blog-Application-Blogs-blog-shows-like-count-chromium\error-context.md
+
+
+Assertion failed: !(hand
+
+le->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 76
+
+
+[21/28] [chromium] › tests\blog-app.spec.ts:312:9 › Blog Application › Me Page › shows user profile information
+[22/28] [chromium] › tests\blog-app.spec.ts:322:9 › Blog Application › Me Page › shows empty reading list message
+  13) [chromium] › tests\blog-app.spec.ts:163:9 › Blog Application › Navigation › logged in user can navigate to create blog page 
+
+    TimeoutError: page.waitForURL: Timeout 10000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/" until "load"
+    ============================================================
+
+       at helpers.ts:51
+
+      49 |   await page.getByTestId("login-button").click()
+      50 |   // ✅ ДОБАВЛЯЕМ ОЖИДАНИЕ НАВИГАЦИИ
+    > 51 |   await page.waitForURL("/", { timeout: 10000 })
+         |              ^
+      52 | }
+      53 |
+      54 | export const createBlog = async (
+        at loginUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:51:14)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:167:7
+
+    Error Context: test-results\blog-app-Blog-Application--82e9e-avigate-to-create-blog-page-chromium\error-context.md
+
+
+[23/28] [chromium] › tests\blog-app.spec.ts:330:9 › Blog Application › Me Page › shows reading list with unread blog
+  14) [chromium] › tests\blog-app.spec.ts:322:9 › Blog Application › Me Page › shows empty reading list message 
+
+    Error: Failed to create user: 500 Internal Server Error - {"error":"Failed to create user"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:302:7
+
+    Error Context: test-results\blog-app-Blog-Application--da257--empty-reading-list-message-chromium\error-context.md
+
+
+Assertion failed: 
+
+!(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 76
+
+
+  15) [chromium] › tests\blog-app.spec.ts:195:9 › Blog Application › Blogs › logged in user can create a blog 
+
+    TimeoutError: page.waitForURL: Timeout 10000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/" until "load"
+    ============================================================
+
+       at helpers.ts:51
+
+      49 |   await page.getByTestId("login-button").click()
+      50 |   // ✅ ДОБАВЛЯЕМ ОЖИДАНИЕ НАВИГАЦИИ
+    > 51 |   await page.waitForURL("/", { timeout: 10000 })
+         |              ^
+      52 | }
+      53 |
+      54 | export const createBlog = async (
+        at loginUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:51:14)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:196:7
+
+    Error Context: test-results\blog-app-Blog-Application--917dc-d-in-user-can-create-a-blog-chromium\error-context.md
+
+
+[24/28] [chromium] › tests\blog-app.spec.ts:393:9 › Blog Application › Me Page › shows multiple blogs in reading list
+[25/28] [chromium] › tests\blog-app.spec.ts:360:9 › Blog Application › Me Page › can mark blog as read
+  16) [chromium] › tests\blog-app.spec.ts:330:9 › Blog Application › Me Page › shows reading list with unread blog 
+
+    Error: Failed to create user: 400 Bad Request - {"error":"Username already exists"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:302:7
+
+    Error Context: test-results\blog-app-Blog-Application--ceac5-ading-list-with-unread-blog-chromium\error-context.md
+
+
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 76
+
+
+[26/28] [chromium] › tests\blog-app.spec.ts:428:9 › Blog Application › Me Page › shows API token section
+  17) [chromium] › tests\blog-app.spec.ts:428:9 › Blog Application › Me Page › shows API token section 
+
+    Error: Failed to create user: 500 Internal Server Error - {"error":"Failed to create user"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:302:7
+
+    Error Context: test-results\blog-app-Blog-Application-Me-Page-shows-API-token-section-chromium\error-context.md
+
+
+Assertion failed: !(handle->flags & UV_H
+
+ANDLE_CLOSING), file src\win\async.c, line 76
+
+
+[27/28] [chromium] › tests\blog-app.spec.ts:437:9 › Blog Application › Me Page › can generate API token
+  18) [chromium] › tests\blog-app.spec.ts:393:9 › Blog Application › Me Page › shows multiple blogs in reading list 
+
+    Error: Failed to create user: 500 Internal Server Error - {"error":"Failed to create user"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:395:7
+
+    Error Context: test-results\blog-app-Blog-Application--8cecf-tiple-blogs-in-reading-list-chromium\error-context.md
+
+
+[28/28] [chromium] › tests\blog-app.spec.ts:452:9 › Blog Application › Me Page › can regenerate API token
+  19) [chromium] › tests\blog-app.spec.ts:437:9 › Blog Application › Me Page › can generate API token 
+
+    Error: Failed to create user: 400 Bad Request - {"error":"Username already exists"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:302:7
+
+    Error Context: test-results\blog-app-Blog-Application-Me-Page-can-generate-API-token-chromium\error-context.md
+
+
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 76
+
+
+  20) [chromium] › tests\blog-app.spec.ts:312:9 › Blog Application › Me Page › shows user profile information 
+
+    TimeoutError: page.waitForURL: Timeout 10000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/" until "load"
+    ============================================================
+
+       at helpers.ts:51
+
+      49 |   await page.getByTestId("login-button").click()
+      50 |   // ✅ ДОБАВЛЯЕМ ОЖИДАНИЕ НАВИГАЦИИ
+    > 51 |   await page.waitForURL("/", { timeout: 10000 })
+         |              ^
+      52 | }
+      53 |
+      54 | export const createBlog = async (
+        at loginUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:51:14)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:313:7
+
+    Error Context: test-results\blog-app-Blog-Application--c3877-ws-user-profile-information-chromium\error-context.md
+
+
+  21) [chromium] › tests\blog-app.spec.ts:452:9 › Blog Application › Me Page › can regenerate API token 
+
+    Error: Failed to create user: 500 Internal Server Error - {"error":"Failed to create user"}
+
+       at helpers.ts:34
+
+      32 |   if (!response.ok) {
+      33 |     const errorText = await response.text()
+    > 34 |     throw new Error(
+         |           ^
+      35 |       `Failed to create user: ${response.status} ${response.statusText} - ${errorText}`,
+      36 |     )
+      37 |   }
+        at createUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:34:11)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:302:7
+
+    Error Context: test-results\blog-app-Blog-Application-Me-Page-can-regenerate-API-token-chromium\error-context.md
+
+
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 76
+
+
+  22) [chromium] › tests\blog-app.spec.ts:153:9 › Blog Application › Navigation › user can navigate to blogs page 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('link', { name: 'blogs', exact: true })
+
+
+      156 |       // Click on blogs link in navbar
+      157 |       const blogsLink = page.getByRole('link', { name: 'blogs', exact: true })
+    > 158 |       await blogsLink.click()
+          |                       ^
+      159 |
+      160 |       await expect(page).toHaveURL('/blogs')
+      161 |     })
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:158:23
+
+    Error Context: test-results\blog-app-Blog-Application--aafdc--can-navigate-to-blogs-page-chromium\error-context.md
+
+
+  23) [chromium] › tests\blog-app.spec.ts:360:9 › Blog Application › Me Page › can mark blog as read 
+
+    TimeoutError: page.waitForURL: Timeout 10000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "/" until "load"
+    ============================================================
+
+       at helpers.ts:51
+
+      49 |   await page.getByTestId("login-button").click()
+      50 |   // ✅ ДОБАВЛЯЕМ ОЖИДАНИЕ НАВИГАЦИИ
+    > 51 |   await page.waitForURL("/", { timeout: 10000 })
+         |              ^
+      52 | }
+      53 |
+      54 | export const createBlog = async (
+        at loginUser (C:\Users\User\Desktop\fso-nextjs-app\tests\helpers.ts:51:14)
+        at C:\Users\User\Desktop\fso-nextjs-app\tests\blog-app.spec.ts:363:7
+
+    Error Context: test-results\blog-app-Blog-Application-Me-Page-can-mark-blog-as-read-chromium\error-context.md
+
+
