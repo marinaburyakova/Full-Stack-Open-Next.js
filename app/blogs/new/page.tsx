@@ -1,7 +1,10 @@
+// app/blogs/new/page.tsx
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { createBlog, ActionState } from '../actions'
+import { useNotification } from '../../context/NotificationContext'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 const initialState: ActionState = {
@@ -11,7 +14,19 @@ const initialState: ActionState = {
 }
 
 export default function NewBlogPage() {
+  const router = useRouter()
+  const { showNotification } = useNotification()
   const [state, formAction] = useActionState(createBlog, initialState)
+
+  useEffect(() => {
+    if (state.success) {
+      showNotification(state.message || 'Blog created successfully!', 'success')
+      router.push('/blogs')
+    }
+    if (state.errors?._form) {
+      showNotification(state.errors._form[0], 'error')
+    }
+  }, [state, showNotification, router])
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -40,8 +55,8 @@ export default function NewBlogPage() {
             </label>
             <input
               id="title"
-              type="text"
               name="title"
+              type="text"
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="Enter blog title"
               required
@@ -62,8 +77,8 @@ export default function NewBlogPage() {
             </label>
             <input
               id="author"
-              type="text"
               name="author"
+              type="text"
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="Enter author name"
               required
@@ -84,8 +99,8 @@ export default function NewBlogPage() {
             </label>
             <input
               id="url"
-              type="text"
               name="url"
+              type="text"
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               placeholder="https://example.com"
             />
@@ -100,12 +115,6 @@ export default function NewBlogPage() {
               className="p-3 bg-red-50 border border-red-200 rounded-lg"
             >
               <p className="text-sm text-red-600">{state.errors._form[0]}</p>
-            </div>
-          )}
-
-          {state.success && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-600">{state.message}</p>
             </div>
           )}
 
