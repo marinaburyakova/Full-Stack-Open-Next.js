@@ -3,7 +3,7 @@
 
 import { auth } from '../../auth';
 import { db } from '../db';
-import { blogs, readingList } from '../db/schema';
+import { blogs } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -82,27 +82,17 @@ export async function createBlog(prevState: ActionState, formData: FormData): Pr
   try {
     const normalizedUrl = url ? normalizeUrl(url) : null;
 
-    const [newBlog] = await db
-      .insert(blogs)
-      .values({
-        title: title.trim(),
-        author: author.trim(),
-        url: normalizedUrl,
-        userId: session.user.id,
-      })
-      .returning();
-
-    if (newBlog) {
-      await db.insert(readingList).values({
-        userId: session.user.id,
-        blogId: newBlog.id,
-      });
-    }
+    await db.insert(blogs).values({
+      title: title.trim(),
+      author: author.trim(),
+      url: normalizedUrl,
+      userId: session.user.id,
+    });
 
     revalidatePath('/blogs');
     return {
       success: true,
-      message: 'Blog created successfully and added to your reading list!',
+      message: 'Blog created successfully!',
     };
   } catch (error) {
     console.error('Create blog error:', error);
@@ -172,17 +162,10 @@ export async function deleteBlog(formData: FormData) {
     throw new Error('Blog not found');
   }
 
-  // ✅ Исправлено: сравниваем UUID как строки
   if (blog.userId !== session.user.id) {
     throw new Error('You are not authorized to delete this blog');
   }
 
-  // Удаляем из списка чтения
-  await db
-    .delete(readingList)
-    .where(eq(readingList.blogId, id));
-
-  // Удаляем блог
   await db.delete(blogs).where(eq(blogs.id, id));
 
   revalidatePath('/blogs');
@@ -221,7 +204,6 @@ export async function updateBlog(formData: FormData) {
     throw new Error('Blog not found');
   }
 
-  // ✅ Исправлено: сравниваем UUID как строки
   if (blog.userId !== session.user.id) {
     throw new Error('You are not authorized to update this blog');
   }
