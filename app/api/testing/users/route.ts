@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Проверяем существующего пользователя в схеме TEST
+    // ✅ Проверяем в схеме TEST
     const [existingUser] = await db
       .select()
       .from(users)

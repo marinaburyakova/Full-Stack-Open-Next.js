@@ -13,8 +13,8 @@ export const resetDatabase = async () => {
       `Failed to reset database: ${response.status} ${response.statusText} - ${errorText}`,
     )
   }
-  // Ждём, чтобы база успела очиститься
-  await new Promise(resolve => setTimeout(resolve, 300))
+  // ✅ ДОБАВЛЯЕМ ЗАДЕРЖКУ ПОСЛЕ СБРОСА
+  await new Promise(resolve => setTimeout(resolve, 1000))
 }
 
 export const createUser = async (
@@ -47,7 +47,8 @@ export const loginUser = async (
   await page.getByLabel("Username", { exact: true }).fill(username)
   await page.getByLabel("Password", { exact: true }).fill(password)
   await page.getByTestId("login-button").click()
-  await page.waitForURL("/")
+  // ✅ ДОБАВЛЯЕМ ОЖИДАНИЕ НАВИГАЦИИ
+  await page.waitForURL("/", { timeout: 10000 })
 }
 
 export const createBlog = async (
