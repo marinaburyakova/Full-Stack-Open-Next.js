@@ -1,10 +1,20 @@
 // next.config.ts
 import type { NextConfig } from 'next';
+import createMDX from '@next/mdx';
 
 const nextConfig: NextConfig = {
-  /* Здесь можно оставить файл абсолютно чистым. 
-     Next.js сам автоматически и правильно определит корень 
-     как на твоем компьютере, так и в облаке Render. */
+  // Поддержка MDX
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  
+  // Другие настройки
+  experimental: {
+    mdxRs: true,
+  },
 };
 
-export default nextConfig;
+// Создаем конфигурацию MDX
+const withMDX = createMDX({
+  extension: /\.mdx?$/,
+});
+
+export default withMDX(nextConfig);

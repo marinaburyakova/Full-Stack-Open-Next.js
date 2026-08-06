@@ -15,3 +15,132 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* Стили для MDX контента */
+.markdown h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 1.5rem 0 1rem;
+  color: #0f172a;
+}
+
+.markdown h2 {
+  font-size: 1.875rem;
+  font-weight: bold;
+  margin: 2rem 0 0.75rem;
+  color: #0f172a;
+}
+
+.markdown h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+  color: #0f172a;
+}
+
+.markdown h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.5rem;
+  color: #0f172a;
+}
+
+.markdown p {
+  margin: 1rem 0;
+  line-height: 1.8;
+  color: #1e293b;
+}
+
+.markdown a {
+  color: #3b82f6;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.markdown a:hover {
+  color: #2563eb;
+}
+
+.markdown ul {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  line-height: 1.8;
+  list-style-type: disc;
+  color: #1e293b;
+}
+
+.markdown ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  line-height: 1.8;
+  list-style-type: decimal;
+  color: #1e293b;
+}
+
+.markdown li {
+  margin: 0.5rem 0;
+}
+
+.markdown li::marker {
+  color: #6366f1;
+}
+
+.markdown hr {
+  margin: 2.5rem 0;
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #cbd5e1, transparent);
+  opacity: 0.5;
+}
+
+.markdown code {
+  background-color: #f1f5f9;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+}
+
+.markdown pre {
+  background-color: #0f172a;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.markdown pre code {
+  background-color: transparent;
+  color: #e2e8f0;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+.markdown blockquote {
+  border-left: 4px solid #6366f1;
+  padding: 0.5rem 1.5rem;
+  margin: 1rem 0;
+  background-color: #f8fafc;
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #334155;
+}
+
+.markdown img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.markdown strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.markdown em {
+  color: #1e293b;
+}
+
+.markdown .emoji {
+  font-size: 1.2em;
+}
