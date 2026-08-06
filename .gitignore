@@ -1,5 +1,3 @@
-
-
 # dependencies
 /node_modules
 /.pnp
@@ -12,6 +10,11 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
+/playwright/.cache/
+/tests/__screenshots__/
+/tests/__snapshots__/
 
 # next.js
 /.next/
@@ -32,6 +35,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -40,8 +44,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.env
-.env.local
-.env.test
-.env.production
-.env.*.local
+# playwright
+playwright-report/
+test-results/
+playwright/.cache/
+
+# drizzle
+/drizzle
+/app/db/migrations/*.sql
+!app/db/migrations/0000_*.sql

@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
   experimental: {
     mdxRs: true,
   },
+  
+  // ✅ Добавляем поддержку переменных окружения для тестов
+  env: {
+    DATABASE_URL: process.env.DATABASE_URL,
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+  },
 };
 
 // Создаем конфигурацию MDX

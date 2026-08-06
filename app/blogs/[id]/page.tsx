@@ -1,4 +1,4 @@
-
+// app/blogs/[id]/page.tsx
 import { notFound } from 'next/navigation';
 import { auth } from '../../../auth';
 import { db } from '../../db';
@@ -30,7 +30,6 @@ export default async function BlogPage({ params }: PageProps) {
     notFound();
   }
 
-  // Проверяем, в списке ли чтения
   let inReadingList = false;
   let isRead = false;
 
@@ -69,7 +68,6 @@ export default async function BlogPage({ params }: PageProps) {
         <div className="flex justify-between items-start mb-4">
           <h1 className="text-3xl font-bold text-slate-900">{blog.title}</h1>
           
-          {/* Кнопки для списка чтения */}
           {userId && !isOwner && (
             <div className="flex gap-2">
               {inReadingList ? (
@@ -109,9 +107,10 @@ export default async function BlogPage({ params }: PageProps) {
                 }}>
                   <button
                     type="submit"
+                    data-testid="add-to-reading-list-button"
                     className="px-3 py-1.5 text-sm bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition"
                   >
-                     Add to Reading List
+                    📚 Add to Reading List
                   </button>
                 </form>
               )}
@@ -158,14 +157,14 @@ export default async function BlogPage({ params }: PageProps) {
                   type="submit"
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
                 >
-                   Delete
+                  🗑️ Delete
                 </button>
               </form>
               <Link
                 href={`/blogs/${blog.id}/edit`}
                 className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition"
               >
-                 Edit
+                ✏️ Edit
               </Link>
             </>
           )}

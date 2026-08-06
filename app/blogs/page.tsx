@@ -3,6 +3,8 @@ import { db } from '../db';
 import { blogs } from '../db/schema';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default async function BlogsPage() {
   const allBlogs = await db.select().from(blogs);
 
@@ -18,20 +20,20 @@ export default async function BlogsPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4">
+      <div data-testid="blogs-list" className="grid gap-4">
         {allBlogs.length === 0 ? (
           <p className="text-slate-500 italic text-center py-8">No blogs available yet.</p>
         ) : (
           allBlogs.map((blog) => (
-            <Link key={blog.id} href={`/blogs/${blog.id}`}>
-              <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:shadow-md transition cursor-pointer">
-                <h3 className="font-bold text-slate-900">{blog.title}</h3>
-                <p className="text-sm text-slate-500">Author: {blog.author}</p>
-                {blog.url && (
-                  <p className="text-sm text-indigo-600 mt-1">{blog.url}</p>
-                )}
-              </div>
-            </Link>
+            <div key={blog.id} className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+              <Link href={`/blogs/${blog.id}`}>
+                <h3 className="font-bold text-slate-900 hover:text-indigo-600 transition">
+                  {blog.title}
+                </h3>
+              </Link>
+              <p className="text-sm text-slate-500">Author: {blog.author}</p>
+              <p className="text-sm text-slate-500">{blog.likes || 0} likes</p>
+            </div>
           ))
         )}
       </div>

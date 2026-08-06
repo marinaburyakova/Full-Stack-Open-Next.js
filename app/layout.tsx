@@ -90,7 +90,7 @@ export default async function RootLayout({
                   href="/login"
                   className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition shadow-xs cursor-pointer"
                 >
-                  Sign In
+                  Login
                 </Link>
               )}
             </div>

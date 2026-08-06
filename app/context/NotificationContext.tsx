@@ -26,7 +26,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const showNotification = useCallback((message: string, type: NotificationType = 'success') => {
     setNotification({ message, type });
-    // Автоматически скрываем уведомление через 5 секунд
     setTimeout(() => {
       setNotification(null);
     }, 5000);
@@ -36,7 +35,10 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     <NotificationContext.Provider value={{ notification, showNotification, clearNotification }}>
       {children}
       {notification && (
-        <div className="fixed bottom-5 right-5 z-50 animate-bounce">
+        <div 
+          data-testid="notification" 
+          className="fixed bottom-5 right-5 z-50 animate-bounce"
+        >
           <div className={`px-6 py-3 rounded-xl shadow-lg border text-sm font-semibold flex items-center gap-2 ${
             notification.type === 'success' 
               ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 

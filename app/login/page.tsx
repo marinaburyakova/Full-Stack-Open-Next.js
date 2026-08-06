@@ -41,15 +41,12 @@ export default function LoginPage() {
   return (
     <div className="max-w-md mx-auto mt-10">
       <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Sign In</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Login</h1>
         <p className="text-slate-500 text-sm mb-6">
           Welcome back! Sign in to your account.
         </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Username
@@ -79,26 +76,24 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+            <div data-testid="error-message" className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
               {error}
             </div>
           )}
 
           <button
             type="submit"
+            data-testid="login-button"
             disabled={loading}
             className="w-full py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <p className="text-center text-sm text-slate-500 mt-6">
           Don't have an account?{' '}
-          <Link
-            href="/register"
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
-          >
+          <Link href="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
             Register
           </Link>
         </p>

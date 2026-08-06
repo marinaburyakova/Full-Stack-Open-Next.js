@@ -24,18 +24,36 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Set up environment file
+      # ✅ Создаем .env.test файл
+      - name: Create environment file
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env.test
           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env.test
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env.test
           echo "NODE_ENV=test" >> .env.test
-
-      - name: Debug - check if secrets are set
-        run: |
           echo "DATABASE_URL is set: ${{ secrets.DATABASE_URL != '' }}"
-          echo "NEXTAUTH_SECRET is set: ${{ secrets.NEXTAUTH_SECRET != '' }}"
-          echo "NEXTAUTH_URL is set: ${{ secrets.NEXTAUTH_URL != '' }}"
+
+      # ✅ Проверяем, что файл создан
+      - name: Check environment file
+        run: |
+          cat .env.test | grep -v "postgresql://"
+          echo ""
+          echo "✅ .env.test created successfully"
+
+      # ✅ Загружаем переменные окружения для Next.js
+      - name: Set environment variables for Next.js
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> $GITHUB_ENV
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> $GITHUB_ENV
+          echo "NODE_ENV=test" >> $GITHUB_ENV
+
+      # ✅ Проверяем, что переменные установлены
+      - name: Verify environment variables
+        run: |
+          echo "DATABASE_URL exists: ${#DATABASE_URL}"
+          echo "NEXTAUTH_SECRET exists: ${#NEXTAUTH_SECRET}"
+          echo "NEXTAUTH_URL: $NEXTAUTH_URL"
 
       - name: Run database migrations
         run: npx drizzle-kit push
@@ -44,6 +62,10 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

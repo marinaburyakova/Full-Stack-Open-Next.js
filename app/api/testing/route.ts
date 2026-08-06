@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Переключаемся на тестовую схему
+    // ✅ Переключаемся на схему test
     await db.execute(sql`SET search_path TO test`);
 
     const body = await request.json();
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
         name: users.name,
       });
 
-    // Возвращаемся на public
+    // ✅ Возвращаемся на public
     await db.execute(sql`SET search_path TO public`);
 
     return NextResponse.json(
