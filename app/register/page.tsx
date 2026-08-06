@@ -135,7 +135,6 @@ export default function RegisterPage() {
               required
               disabled={loading}
             />
-            {/* ✅ data-testid="username-error" - всегда в DOM */}
             <div data-testid="username-error" className="mt-1">
               {errors.username && (
                 <p className="text-sm text-red-600">{errors.username}</p>
@@ -182,7 +181,6 @@ export default function RegisterPage() {
               required
               disabled={loading}
             />
-            {/* ✅ data-testid="passwordConfirm-error" - всегда в DOM */}
             <div data-testid="passwordConfirm-error" className="mt-1">
               {errors.passwordConfirm && (
                 <p className="text-sm text-red-600">{errors.passwordConfirm}</p>
