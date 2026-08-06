@@ -25,14 +25,14 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
 
-    // Проверка на короткий username
+    // ✅ Проверка на короткий username
     if (formData.username.length < 3) {
       setErrors({ username: 'Username must be at least 3 characters' });
       setLoading(false);
       return;
     }
 
-    // Проверка на совпадение паролей
+    // ✅ Проверка на совпадение паролей
     if (formData.password !== formData.confirmPassword) {
       setErrors({ passwordConfirm: 'Passwords do not match' });
       setLoading(false);
@@ -51,6 +51,7 @@ export default function RegisterPage() {
       });
 
       if (response.ok) {
+        // ✅ Редирект на страницу логина после успешной регистрации
         router.push('/login?registered=true');
       } else {
         const data = await response.json();
