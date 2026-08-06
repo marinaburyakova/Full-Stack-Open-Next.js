@@ -35,9 +35,6 @@ jobs:
       - name: Check environment file
         run: |
           echo "✅ .env.test created successfully"
-          echo "DATABASE_URL exists: ${{ secrets.DATABASE_URL != '' }}"
-          echo "NEXTAUTH_SECRET exists: ${{ secrets.NEXTAUTH_SECRET != '' }}"
-          echo "NEXTAUTH_URL exists: ${{ secrets.NEXTAUTH_URL != '' }}"
 
       - name: Set environment variables for Next.js
         run: |
