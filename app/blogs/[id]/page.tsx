@@ -1,4 +1,4 @@
-// app/blogs/[id]/page.tsx
+
 import { notFound } from 'next/navigation';
 import { auth } from '../../../auth';
 import { db } from '../../db';
@@ -15,12 +15,7 @@ interface PageProps {
 }
 
 export default async function BlogPage({ params }: PageProps) {
-  const { id: idString } = await params;
-  const id = parseInt(idString, 10);
-
-  if (isNaN(id)) {
-    notFound();
-  }
+  const { id: blogId } = await params;
 
   const session = await auth();
   const userId = session?.user?.id;
@@ -28,7 +23,7 @@ export default async function BlogPage({ params }: PageProps) {
   const [blog] = await db
     .select()
     .from(blogs)
-    .where(eq(blogs.id, id))
+    .where(eq(blogs.id, blogId))
     .limit(1);
 
   if (!blog) {
@@ -47,7 +42,7 @@ export default async function BlogPage({ params }: PageProps) {
         .where(
           and(
             eq(readingList.userId, userId),
-            eq(readingList.blogId, id)
+            eq(readingList.blogId, blogId)
           )
         )
         .limit(1);
@@ -81,7 +76,7 @@ export default async function BlogPage({ params }: PageProps) {
                 <>
                   <form action={async () => {
                     'use server';
-                    await markAsRead(id);
+                    await markAsRead(blogId);
                   }}>
                     <button
                       type="submit"
@@ -97,7 +92,7 @@ export default async function BlogPage({ params }: PageProps) {
                   
                   <form action={async () => {
                     'use server';
-                    await removeFromReadingList(id);
+                    await removeFromReadingList(blogId);
                   }}>
                     <button
                       type="submit"
@@ -110,13 +105,13 @@ export default async function BlogPage({ params }: PageProps) {
               ) : (
                 <form action={async () => {
                   'use server';
-                  await addToReadingList(id);
+                  await addToReadingList(blogId);
                 }}>
                   <button
                     type="submit"
                     className="px-3 py-1.5 text-sm bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition"
                   >
-                    📚 Add to Reading List
+                     Add to Reading List
                   </button>
                 </form>
               )}
@@ -163,14 +158,14 @@ export default async function BlogPage({ params }: PageProps) {
                   type="submit"
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
                 >
-                  🗑️ Delete
+                   Delete
                 </button>
               </form>
               <Link
                 href={`/blogs/${blog.id}/edit`}
                 className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition"
               >
-                ✏️ Edit
+                 Edit
               </Link>
             </>
           )}

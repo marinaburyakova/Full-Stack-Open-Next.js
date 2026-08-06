@@ -1,4 +1,4 @@
-
+// app/blogs/readingListActions.ts
 'use server';
 
 import { auth } from '../../auth';
@@ -8,7 +8,8 @@ import { eq, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-export async function addToReadingList(blogId: number) {
+// ✅ Меняем тип с number на string (UUID)
+export async function addToReadingList(blogId: string) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -47,7 +48,8 @@ export async function addToReadingList(blogId: number) {
   }
 }
 
-export async function removeFromReadingList(blogId: number) {
+// ✅ Меняем тип с number на string (UUID)
+export async function removeFromReadingList(blogId: string) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -74,7 +76,8 @@ export async function removeFromReadingList(blogId: number) {
   }
 }
 
-export async function markAsRead(blogId: number) {
+// ✅ Меняем тип с number на string (UUID)
+export async function markAsRead(blogId: string) {
   const session = await auth();
 
   if (!session?.user?.id) {

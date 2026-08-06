@@ -118,18 +118,13 @@ export async function likeBlog(formData: FormData) {
     throw new Error('Blog ID is required');
   }
 
-  const id = parseInt(idString, 10);
-
-  if (isNaN(id)) {
-    throw new Error('Invalid blog ID');
-  }
-
+  // ✅ Используем UUID как строку
   await db
     .update(blogs)
     .set({ likes: sql`${blogs.likes} + 1` })
-    .where(eq(blogs.id, id));
+    .where(eq(blogs.id, idString));
 
-  revalidatePath(`/blogs/${id}`);
+  revalidatePath(`/blogs/${idString}`);
   revalidatePath('/blogs');
 }
 
@@ -146,16 +141,10 @@ export async function deleteBlog(formData: FormData) {
     throw new Error('Blog ID is required');
   }
 
-  const id = parseInt(idString, 10);
-
-  if (isNaN(id)) {
-    throw new Error('Invalid blog ID');
-  }
-
   const [blog] = await db
     .select()
     .from(blogs)
-    .where(eq(blogs.id, id))
+    .where(eq(blogs.id, idString))
     .limit(1);
 
   if (!blog) {
@@ -166,7 +155,7 @@ export async function deleteBlog(formData: FormData) {
     throw new Error('You are not authorized to delete this blog');
   }
 
-  await db.delete(blogs).where(eq(blogs.id, id));
+  await db.delete(blogs).where(eq(blogs.id, idString));
 
   revalidatePath('/blogs');
   redirect('/blogs');
@@ -188,16 +177,10 @@ export async function updateBlog(formData: FormData) {
     throw new Error('All fields are required');
   }
 
-  const id = parseInt(idString, 10);
-
-  if (isNaN(id)) {
-    throw new Error('Invalid blog ID');
-  }
-
   const [blog] = await db
     .select()
     .from(blogs)
-    .where(eq(blogs.id, id))
+    .where(eq(blogs.id, idString))
     .limit(1);
 
   if (!blog) {
@@ -217,9 +200,9 @@ export async function updateBlog(formData: FormData) {
       author: author.trim(),
       url: normalizedUrl,
     })
-    .where(eq(blogs.id, id));
+    .where(eq(blogs.id, idString));
 
-  revalidatePath(`/blogs/${id}`);
+  revalidatePath(`/blogs/${idString}`);
   revalidatePath('/blogs');
-  redirect(`/blogs/${id}`);
+  redirect(`/blogs/${idString}`);
 }
