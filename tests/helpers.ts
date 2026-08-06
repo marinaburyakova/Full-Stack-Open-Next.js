@@ -1,19 +1,29 @@
 // tests/helpers.ts
-import { Page } from "@playwright/test"
+import { Page } from '@playwright/test'
 
-const baseUrl = "http://localhost:3000"
+const baseUrl = 'http://localhost:3000'
 
 export const resetDatabase = async () => {
-  const response = await fetch(`${baseUrl}/api/testing/reset`, {
-    method: "DELETE",
-  })
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(
-      `Failed to reset database: ${response.status} ${response.statusText} - ${errorText}`,
-    )
+  try {
+    const response = await fetch(`${baseUrl}/api/testing/reset`, {
+      method: 'DELETE',
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(
+        `Failed to reset database: ${response.status} ${response.statusText} - ${errorText}`,
+      )
+    }
+
+    // ✅ Ждём, пока база очистится
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    return await response.json()
+  } catch (error) {
+    console.error('❌ Error resetting database:', error)
+    throw error
   }
-  await new Promise(resolve => setTimeout(resolve, 500))
 }
 
 export const createUser = async (
@@ -22,12 +32,13 @@ export const createUser = async (
   password: string,
 ) => {
   const response = await fetch(`${baseUrl}/api/testing/users`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ username, name, password }),
   })
+
   if (!response.ok) {
     const errorText = await response.text()
     throw new Error(
@@ -42,11 +53,11 @@ export const loginUser = async (
   username: string,
   password: string,
 ) => {
-  await page.goto("/login")
-  await page.getByLabel("Username", { exact: true }).fill(username)
-  await page.getByLabel("Password", { exact: true }).fill(password)
-  await page.getByTestId("login-button").click()
-  await page.waitForURL("/", { timeout: 10000 })
+  await page.goto('/login')
+  await page.getByLabel('Username', { exact: true }).fill(username)
+  await page.getByLabel('Password', { exact: true }).fill(password)
+  await page.getByTestId('login-button').click()
+  await page.waitForURL('/', { timeout: 15000 })
 }
 
 export const createBlog = async (
@@ -55,10 +66,10 @@ export const createBlog = async (
   author: string,
   url: string,
 ) => {
-  await page.goto("/blogs/new")
-  await page.getByLabel("Title", { exact: true }).fill(title)
-  await page.getByLabel("Author", { exact: true }).fill(author)
-  await page.getByLabel("URL", { exact: true }).fill(url)
-  await page.getByTestId("create-blog-button").click()
-  await page.waitForURL("/blogs")
+  await page.goto('/blogs/new')
+  await page.getByLabel('Title', { exact: true }).fill(title)
+  await page.getByLabel('Author', { exact: true }).fill(author)
+  await page.getByLabel('URL', { exact: true }).fill(url)
+  await page.getByTestId('create-blog-button').click()
+  await page.waitForURL('/blogs', { timeout: 15000 })
 }

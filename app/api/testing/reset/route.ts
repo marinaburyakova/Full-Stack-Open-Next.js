@@ -14,19 +14,21 @@ export async function DELETE() {
   try {
     console.log('🔄 Resetting test database...');
 
-    // ✅ Удаляем данные напрямую из схемы test
+    // ✅ Удаляем данные из TEST схемы в правильном порядке
     await db.execute(sql`DELETE FROM test.reading_list`);
     await db.execute(sql`DELETE FROM test.blogs`);
     await db.execute(sql`DELETE FROM test.users`);
+
+    // Сбрасываем счетчики
     await db.execute(sql`ALTER SEQUENCE test.reading_list_id_seq RESTART WITH 1`);
 
     console.log('✅ Test database reset successfully');
 
     return NextResponse.json(
-      { 
-        success: true, 
+      {
+        success: true,
         message: 'All test data has been reset successfully',
-        schema: 'test'
+        schema: 'test',
       },
       { status: 200 }
     );

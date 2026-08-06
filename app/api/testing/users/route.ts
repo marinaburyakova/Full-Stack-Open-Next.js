@@ -1,12 +1,11 @@
 // app/api/testing/users/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '../../../db';
-import { users } from '../../../db/schema';
-import { eq } from 'drizzle-orm';
-import bcrypt from 'bcryptjs';
 import { sql } from 'drizzle-orm';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
+  // Защита: запрещаем в продакшене
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json(
       { error: 'This endpoint is not available in production' },
@@ -15,12 +14,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    // ✅ ПЕРЕКЛЮЧАЕМСЯ НА СХЕМУ TEST
-    await db.execute(sql`SET search_path TO test`);
-
+    // Парсим тело запроса
     const body = await request.json();
     const { username, name, password } = body;
 
+    // Валидация
     if (!username || !name || !password) {
       return NextResponse.json(
         { error: 'Username, name, and password are required' },
@@ -42,48 +40,54 @@ export async function POST(request: Request) {
       );
     }
 
-    // ✅ Проверяем в схеме TEST
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, username))
-      .limit(1);
+    // Проверяем, существует ли пользователь в TEST схеме
+    const existingUser = await db.execute(
+      sql`SELECT id FROM test.users WHERE username = ${username} LIMIT 1`
+    );
 
-    if (existingUser) {
+    // ✅ Исправлено: проверяем через Array.isArray и длину
+    if (existingUser && Array.isArray(existingUser) && existingUser.length > 0) {
       return NextResponse.json(
         { error: 'Username already exists' },
         { status: 400 }
       );
     }
 
+    // Хешируем пароль
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const [newUser] = await db
-      .insert(users)
-      .values({
-        username,
-        name,
-        passwordHash,
-      })
-      .returning({
-        id: users.id,
-        username: users.username,
-        name: users.name,
-      });
+    // ✅ Вставляем напрямую в схему test с RETURNING
+    const result = await db.execute(
+      sql`
+        INSERT INTO test.users (name, username, password_hash)
+        VALUES (${name}, ${username}, ${passwordHash})
+        RETURNING id, username, name
+      `
+    );
 
-    // ✅ ВОЗВРАЩАЕМСЯ НА PUBLIC
-    await db.execute(sql`SET search_path TO public`);
+    // ✅ Исправлено: получаем первый элемент из результата
+    const newUser = result && Array.isArray(result) && result.length > 0 ? result[0] : null;
+
+    if (!newUser) {
+      throw new Error('Failed to create user');
+    }
+
+    console.log('✅ User created in test schema:', newUser);
 
     return NextResponse.json(
       {
         success: true,
-        message: 'User created successfully in test schema',
-        user: newUser,
+        message: 'User created successfully',
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          name: newUser.name,
+        },
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error('❌ Error creating user:', error);
     return NextResponse.json(
       { error: 'Failed to create user' },
       { status: 500 }
