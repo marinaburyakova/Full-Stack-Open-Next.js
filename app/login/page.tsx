@@ -4,11 +4,9 @@ import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useNotification } from '../context/NotificationContext'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { showNotification } = useNotification()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -29,7 +27,6 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Invalid username or password')
       } else {
-        showNotification('Successfully logged in!', 'success')
         router.push('/')
         router.refresh()
       }
@@ -49,9 +46,15 @@ export default function LoginPage() {
           Welcome back! Sign in to your account.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-1">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-slate-700 mb-1"
+            >
               Username
             </label>
             <input
@@ -66,7 +69,10 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-slate-700 mb-1"
+            >
               Password
             </label>
             <input
@@ -81,7 +87,10 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div data-testid="error-message" className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+            <div
+              data-testid="error-message"
+              className="text-red-600 text-sm bg-red-50 p-3 rounded-lg"
+            >
               {error}
             </div>
           )}
@@ -98,7 +107,10 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-slate-500 mt-6">
           Don't have an account?{' '}
-          <Link href="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
+          <Link
+            href="/register"
+            className="text-indigo-600 hover:text-indigo-700 font-medium"
+          >
             Register
           </Link>
         </p>
