@@ -14,27 +14,13 @@ export async function DELETE() {
   try {
     console.log('🔄 Resetting test database...');
 
-    // ✅ ПЕРЕКЛЮЧАЕМСЯ НА СХЕМУ TEST
-    await db.execute(sql`SET search_path TO test`);
-    console.log('✅ Switched to test schema');
+    // ✅ Удаляем данные напрямую из схемы test
+    await db.execute(sql`DELETE FROM test.reading_list`);
+    await db.execute(sql`DELETE FROM test.blogs`);
+    await db.execute(sql`DELETE FROM test.users`);
+    await db.execute(sql`ALTER SEQUENCE test.reading_list_id_seq RESTART WITH 1`);
 
-    // Удаляем данные
-    await db.execute(sql`DELETE FROM "reading_list"`);
-    console.log('✅ Deleted reading_list');
-
-    await db.execute(sql`DELETE FROM "blogs"`);
-    console.log('✅ Deleted blogs');
-
-    await db.execute(sql`DELETE FROM "users"`);
-    console.log('✅ Deleted users');
-
-    // Сбрасываем счетчики
-    await db.execute(sql`ALTER SEQUENCE "reading_list_id_seq" RESTART WITH 1`);
-    console.log('✅ Reset sequences');
-
-    // ✅ ВОЗВРАЩАЕМСЯ НА PUBLIC
-    await db.execute(sql`SET search_path TO public`);
-    console.log('✅ Switched back to public schema');
+    console.log('✅ Test database reset successfully');
 
     return NextResponse.json(
       { 

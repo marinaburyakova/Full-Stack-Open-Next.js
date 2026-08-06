@@ -3,7 +3,7 @@ import { auth } from '../../auth';
 import { redirect } from 'next/navigation';
 import { db } from '../db';
 import { users, readingList, blogs } from '../db/schema';
-import { eq} from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { generateApiToken } from '../api/auth/meActions';
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +37,6 @@ export default async function MePage() {
     .where(eq(readingList.userId, session.user.id));
 
   const unreadItems = readingItems.filter(item => !item.isRead);
-  
 
   return (
     <div className="max-w-xl mx-auto space-y-6 mt-6">
@@ -99,7 +98,7 @@ export default async function MePage() {
             <p className="text-xs text-slate-500 mt-0.5">Use this token to authenticate external API requests.</p>
           </div>
 
-          <div className="bg-white border border-slate-200 px-4 py-3 rounded-lg font-mono text-sm break-all text-slate-700 min-h-11.5 flex items-center">
+          <div data-testid="token-display" className="bg-white border border-slate-200 px-4 py-3 rounded-lg font-mono text-sm break-all text-slate-700 min-h-11.5 flex items-center">
             {dbUser?.apiToken ? (
               <span data-testid="api-token" className="text-indigo-600 font-semibold">
                 {dbUser.apiToken}

@@ -16,7 +16,7 @@ export default function RegisterPage() {
     username?: string;
     passwordConfirm?: string;
   }>({});
-  const [serverError, setServerError] = useState(''); // ✅ переименовали
+  const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
