@@ -357,8 +357,6 @@ test.describe('Blog Application', () => {
       await page.getByRole('link', { name: uniqueTitle }).click()
 
       await expect(page).toHaveURL(/\/blogs\/[a-f0-9-]+/)
-
-      // ✅ Используем альтернативные локаторы
       await expect(page.getByRole('heading', { level: 1 })).toContainText(
         uniqueTitle,
       )
