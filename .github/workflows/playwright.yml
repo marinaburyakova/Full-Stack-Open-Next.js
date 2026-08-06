@@ -48,7 +48,6 @@ jobs:
           echo "NEXTAUTH_SECRET exists: ${#NEXTAUTH_SECRET}"
           echo "NEXTAUTH_URL: $NEXTAUTH_URL"
 
-      # ✅ Создаем тестовую схему
       - name: Create test schema
         run: |
           echo "Creating test schema..."
@@ -56,13 +55,11 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      # ✅ Запускаем миграции
       - name: Run database migrations
         run: npx drizzle-kit push
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      # ✅ Запускаем тесты (без отладки)
       - name: Run Playwright tests
         run: npx playwright test
         env:
@@ -70,10 +67,9 @@ jobs:
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
           NODE_ENV: test
-          # ✅ Отключаем отладочные скриншоты
+          DEBUG: 0
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
-      # ✅ Сохраняем отчет только если тесты упали
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
