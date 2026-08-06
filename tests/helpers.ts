@@ -1,3 +1,4 @@
+// tests/helpers.ts
 import { Page } from "@playwright/test"
 
 const baseUrl = "http://localhost:3000"
@@ -12,6 +13,8 @@ export const resetDatabase = async () => {
       `Failed to reset database: ${response.status} ${response.statusText} - ${errorText}`,
     )
   }
+  // Ждём, чтобы база успела очиститься
+  await new Promise(resolve => setTimeout(resolve, 300))
 }
 
 export const createUser = async (
@@ -43,8 +46,7 @@ export const loginUser = async (
   await page.goto("/login")
   await page.getByLabel("Username", { exact: true }).fill(username)
   await page.getByLabel("Password", { exact: true }).fill(password)
-  await page.getByRole("button", { name: "Login" }).click()
-  // Wait for navigation or notification
+  await page.getByTestId("login-button").click()
   await page.waitForURL("/")
 }
 
@@ -58,7 +60,6 @@ export const createBlog = async (
   await page.getByLabel("Title", { exact: true }).fill(title)
   await page.getByLabel("Author", { exact: true }).fill(author)
   await page.getByLabel("URL", { exact: true }).fill(url)
-  await page.getByRole("button", { name: "Create" }).click()
-  // Wait for navigation to blogs page
+  await page.getByTestId("create-blog-button").click()
   await page.waitForURL("/blogs")
 }

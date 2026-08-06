@@ -15,7 +15,7 @@ export async function DELETE() {
     // ✅ Переключаемся на схему test
     await db.execute(sql`SET search_path TO test`);
     
-    // Удаляем данные
+    // Удаляем данные из всех таблиц в правильном порядке
     await db.execute(sql`DELETE FROM "reading_list"`);
     await db.execute(sql`DELETE FROM "blogs"`);
     await db.execute(sql`DELETE FROM "users"`);

@@ -4,9 +4,9 @@ import { db } from '../../../db';
 import { users } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
+import { sql } from 'drizzle-orm';
 
 export async function POST(request: Request) {
-  // Защита: запрещаем в продакшене
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json(
       { error: 'This endpoint is not available in production' },
@@ -15,10 +15,12 @@ export async function POST(request: Request) {
   }
 
   try {
+    // ✅ Переключаемся на схему test
+    await db.execute(sql`SET search_path TO test`);
+
     const body = await request.json();
     const { username, name, password } = body;
 
-    // Валидация
     if (!username || !name || !password) {
       return NextResponse.json(
         { error: 'Username, name, and password are required' },
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Проверяем, существует ли пользователь
+    // Проверяем существующего пользователя в схеме test
     const [existingUser] = await db
       .select()
       .from(users)
@@ -54,10 +56,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Хешируем пароль
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Создаем пользователя
     const [newUser] = await db
       .insert(users)
       .values({
@@ -71,10 +71,13 @@ export async function POST(request: Request) {
         name: users.name,
       });
 
+    // ✅ Возвращаемся на public
+    await db.execute(sql`SET search_path TO public`);
+
     return NextResponse.json(
       {
         success: true,
-        message: 'User created successfully',
+        message: 'User created successfully in test schema',
         user: newUser,
       },
       { status: 201 }

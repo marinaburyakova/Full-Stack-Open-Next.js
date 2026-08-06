@@ -31,7 +31,7 @@ export default async function BlogsPage() {
                   {blog.title}
                 </h3>
               </Link>
-              <p className="text-sm text-slate-500">Author: {blog.author}</p>
+              <p className="text-sm text-slate-500">By: {blog.author}</p>
               <p className="text-sm text-slate-500">{blog.likes || 0} likes</p>
             </div>
           ))
