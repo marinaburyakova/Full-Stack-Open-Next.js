@@ -24,23 +24,17 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
-      # ✅ Создаем .env.test файл
       - name: Create environment file
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env.test
           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env.test
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env.test
           echo "NODE_ENV=test" >> .env.test
-          echo "DATABASE_URL is set: ${{ secrets.DATABASE_URL != '' }}"
 
-      # ✅ Проверяем, что файл создан
       - name: Check environment file
         run: |
-          cat .env.test | grep -v "postgresql://"
-          echo ""
           echo "✅ .env.test created successfully"
 
-      # ✅ Загружаем переменные окружения для Next.js
       - name: Set environment variables for Next.js
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
@@ -48,7 +42,6 @@ jobs:
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> $GITHUB_ENV
           echo "NODE_ENV=test" >> $GITHUB_ENV
 
-      # ✅ Проверяем, что переменные установлены
       - name: Verify environment variables
         run: |
           echo "DATABASE_URL exists: ${#DATABASE_URL}"
