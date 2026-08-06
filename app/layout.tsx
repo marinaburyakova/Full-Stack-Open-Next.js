@@ -83,7 +83,7 @@ export default async function RootLayout({
                   </form>
                 </div>
               ) : (
-                // ✅ Добавляем ссылки "Login" и "Register" для неавторизованных пользователей
+                // ✅ Ссылки "Login" и "Register" для тестов
                 <div className="flex gap-3">
                   <Link
                     href="/login"
