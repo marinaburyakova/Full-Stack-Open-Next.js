@@ -19,21 +19,47 @@ export default function RegisterPage() {
   const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // ✅ Валидация при потере фокуса
+  const validateUsername = (value: string) => {
+    if (value.length < 3) {
+      setErrors(prev => ({ ...prev, username: 'Username must be at least 3 characters' }));
+      return false;
+    } else {
+      setErrors(prev => ({ ...prev, username: undefined }));
+      return true;
+    }
+  };
+
+  const validatePasswordMatch = (password: string, confirm: string) => {
+    if (password !== confirm && confirm.length > 0) {
+      setErrors(prev => ({ ...prev, passwordConfirm: 'Passwords do not match' }));
+      return false;
+    } else {
+      setErrors(prev => ({ ...prev, passwordConfirm: undefined }));
+      return true;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     setErrors({});
     setServerError('');
     
-    // Проверка на короткий username
+    // ✅ Проверка на короткий username
     if (formData.username.length < 3) {
       setErrors({ username: 'Username must be at least 3 characters' });
+      // ✅ Добавляем focus на поле
+      const usernameInput = document.getElementById('username');
+      if (usernameInput) usernameInput.focus();
       return;
     }
 
-    // Проверка на совпадение паролей
+    // ✅ Проверка на совпадение паролей
     if (formData.password !== formData.confirmPassword) {
       setErrors({ passwordConfirm: 'Passwords do not match' });
+      const confirmInput = document.getElementById('confirmPassword');
+      if (confirmInput) confirmInput.focus();
       return;
     }
 
@@ -71,7 +97,7 @@ export default function RegisterPage() {
           Create your account to get started!
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
               Name
@@ -95,16 +121,26 @@ export default function RegisterPage() {
               id="username"
               type="text"
               value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, username: e.target.value });
+                // ✅ Проверяем при вводе
+                if (e.target.value.length > 0 && e.target.value.length < 3) {
+                  setErrors(prev => ({ ...prev, username: 'Username must be at least 3 characters' }));
+                } else {
+                  setErrors(prev => ({ ...prev, username: undefined }));
+                }
+              }}
+              onBlur={(e) => validateUsername(e.target.value)}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               required
               disabled={loading}
             />
-            {errors.username && (
-              <p data-testid="username-error" className="mt-1 text-sm text-red-600">
-                {errors.username}
-              </p>
-            )}
+            {/* ✅ data-testid="username-error" - всегда в DOM */}
+            <div data-testid="username-error" className="mt-1">
+              {errors.username && (
+                <p className="text-sm text-red-600">{errors.username}</p>
+              )}
+            </div>
           </div>
 
           <div>
@@ -115,7 +151,13 @@ export default function RegisterPage() {
               id="password"
               type="password"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, password: e.target.value });
+                // ✅ Проверяем совпадение при вводе
+                if (formData.confirmPassword.length > 0) {
+                  validatePasswordMatch(e.target.value, formData.confirmPassword);
+                }
+              }}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               required
               minLength={6}
@@ -131,16 +173,21 @@ export default function RegisterPage() {
               id="confirmPassword"
               type="password"
               value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              onChange={(e) => {
+                setFormData({ ...formData, confirmPassword: e.target.value });
+                // ✅ Проверяем совпадение при вводе
+                validatePasswordMatch(formData.password, e.target.value);
+              }}
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               required
               disabled={loading}
             />
-            {errors.passwordConfirm && (
-              <p data-testid="passwordConfirm-error" className="mt-1 text-sm text-red-600">
-                {errors.passwordConfirm}
-              </p>
-            )}
+            {/* ✅ data-testid="passwordConfirm-error" - всегда в DOM */}
+            <div data-testid="passwordConfirm-error" className="mt-1">
+              {errors.passwordConfirm && (
+                <p className="text-sm text-red-600">{errors.passwordConfirm}</p>
+              )}
+            </div>
           </div>
 
           {serverError && (

@@ -5,7 +5,6 @@ import { sql } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
-  // Защита: запрещаем в продакшене
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json(
       { error: 'This endpoint is not available in production' },
@@ -14,11 +13,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Парсим тело запроса
     const body = await request.json();
     const { username, name, password } = body;
 
-    // Валидация
     if (!username || !name || !password) {
       return NextResponse.json(
         { error: 'Username, name, and password are required' },
@@ -40,23 +37,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Проверяем, существует ли пользователь в TEST схеме
-    const existingUser = await db.execute(
+    // ✅ Проверяем существование пользователя
+    const existing = await db.execute(
       sql`SELECT id FROM test.users WHERE username = ${username} LIMIT 1`
     );
 
-    // ✅ Исправлено: проверяем через Array.isArray и длину
-    if (existingUser && Array.isArray(existingUser) && existingUser.length > 0) {
+    if (existing && Array.isArray(existing) && existing.length > 0) {
       return NextResponse.json(
         { error: 'Username already exists' },
         { status: 400 }
       );
     }
 
-    // Хешируем пароль
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // ✅ Вставляем напрямую в схему test с RETURNING
     const result = await db.execute(
       sql`
         INSERT INTO test.users (name, username, password_hash)
@@ -65,14 +59,11 @@ export async function POST(request: Request) {
       `
     );
 
-    // ✅ Исправлено: получаем первый элемент из результата
     const newUser = result && Array.isArray(result) && result.length > 0 ? result[0] : null;
 
     if (!newUser) {
       throw new Error('Failed to create user');
     }
-
-    console.log('✅ User created in test schema:', newUser);
 
     return NextResponse.json(
       {
