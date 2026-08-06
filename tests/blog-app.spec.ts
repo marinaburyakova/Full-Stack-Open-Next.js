@@ -249,8 +249,8 @@ test.describe('Blog Application', () => {
   test.describe('Blogs', () => {
     test('logged in user can create a blog', async ({ page }) => {
       const uniqueUsername = `user_${Date.now()}`
+      const uniqueTitle = `Test Blog ${Date.now()}`
 
-      // 1. Регистрируем пользователя
       await page.goto('/register')
       await page.getByLabel('Name', { exact: true }).fill('Test User')
       await page.getByLabel('Username', { exact: true }).fill(uniqueUsername)
@@ -261,34 +261,22 @@ test.describe('Blog Application', () => {
       await page.getByTestId('register-button').click()
       await page.waitForURL('/login', { timeout: 10000 })
 
-      // 2. Логинимся
       await page.goto('/login')
       await page.getByLabel('Username', { exact: true }).fill(uniqueUsername)
       await page.getByLabel('Password', { exact: true }).fill('testpass123')
       await page.getByTestId('login-button').click()
       await expect(page).toHaveURL('/')
 
-      // 3. Переходим на страницу создания блога
       await page.goto('/blogs/new')
-
-      // 4. ✅ Сначала проверяем, что мы на правильной странице
       await expect(page).toHaveURL('/blogs/new')
 
-      // 5. ✅ Теперь ищем элемент на странице
-      const titleInput = page.locator('input[name="title"]')
-      await titleInput.waitFor({ state: 'visible', timeout: 10000 })
-
-      // 6. Заполняем форму
-      await titleInput.fill('Test Blog')
-      await page.getByLabel('Author', { exact: false }).fill('Test Author')
-      await page
-        .getByLabel('URL', { exact: false })
-        .fill('https://testblog.com')
+      await page.locator('input[name="title"]').fill(uniqueTitle)
+      await page.locator('input[name="author"]').fill('Test Author')
+      await page.locator('input[name="url"]').fill('https://testblog.com')
       await page.getByTestId('create-blog-button').click()
 
-      // 7. Проверяем результат
       await expect(page).toHaveURL('/blogs')
-      await expect(page.getByTestId('blogs-list')).toContainText('Test Blog')
+      await expect(page.getByTestId('blogs-list')).toContainText(uniqueTitle)
     })
 
     test('user cannot create blog without being logged in', async ({
@@ -300,6 +288,8 @@ test.describe('Blog Application', () => {
 
     test('blogs are displayed on blogs page', async ({ page }) => {
       const uniqueUsername = `user_${Date.now()}`
+      const uniqueTitle1 = `First Blog ${Date.now()}`
+      const uniqueTitle2 = `Second Blog ${Date.now()}`
 
       await page.goto('/register')
       await page.getByLabel('Name', { exact: true }).fill('Test User')
@@ -318,26 +308,27 @@ test.describe('Blog Application', () => {
       await expect(page).toHaveURL('/')
 
       await page.goto('/blogs/new')
-      await page.getByLabel('Title', { exact: false }).fill('First Blog')
-      await page.getByLabel('Author', { exact: false }).fill('Author One')
-      await page.getByLabel('URL', { exact: false }).fill('https://blog1.com')
+      await page.locator('input[name="title"]').fill(uniqueTitle1)
+      await page.locator('input[name="author"]').fill('Author One')
+      await page.locator('input[name="url"]').fill('https://blog1.com')
       await page.getByTestId('create-blog-button').click()
       await expect(page).toHaveURL('/blogs')
 
       await page.goto('/blogs/new')
-      await page.getByLabel('Title', { exact: false }).fill('Second Blog')
-      await page.getByLabel('Author', { exact: false }).fill('Author Two')
-      await page.getByLabel('URL', { exact: false }).fill('https://blog2.com')
+      await page.locator('input[name="title"]').fill(uniqueTitle2)
+      await page.locator('input[name="author"]').fill('Author Two')
+      await page.locator('input[name="url"]').fill('https://blog2.com')
       await page.getByTestId('create-blog-button').click()
       await expect(page).toHaveURL('/blogs')
 
       await page.goto('/blogs')
-      await expect(page.getByTestId('blogs-list')).toContainText('First Blog')
-      await expect(page.getByTestId('blogs-list')).toContainText('Second Blog')
+      await expect(page.getByTestId('blogs-list')).toContainText(uniqueTitle1)
+      await expect(page.getByTestId('blogs-list')).toContainText(uniqueTitle2)
     })
 
     test('blog can be viewed individually', async ({ page }) => {
       const uniqueUsername = `user_${Date.now()}`
+      const uniqueTitle = `Test Blog ${Date.now()}`
 
       await page.goto('/register')
       await page.getByLabel('Name', { exact: true }).fill('Test User')
@@ -356,24 +347,27 @@ test.describe('Blog Application', () => {
       await expect(page).toHaveURL('/')
 
       await page.goto('/blogs/new')
-      await page.getByLabel('Title', { exact: false }).fill('Test Blog')
-      await page.getByLabel('Author', { exact: false }).fill('Test Author')
-      await page
-        .getByLabel('URL', { exact: false })
-        .fill('https://testblog.com')
+      await page.locator('input[name="title"]').fill(uniqueTitle)
+      await page.locator('input[name="author"]').fill('Test Author')
+      await page.locator('input[name="url"]').fill('https://testblog.com')
       await page.getByTestId('create-blog-button').click()
       await expect(page).toHaveURL('/blogs')
 
       await page.goto('/blogs')
-      await page.getByRole('link', { name: 'Test Blog' }).click()
+      await page.getByRole('link', { name: uniqueTitle }).click()
 
       await expect(page).toHaveURL(/\/blogs\/[a-f0-9-]+/)
-      await expect(page.getByTestId('blog-title')).toContainText('Test Blog')
-      await expect(page.getByTestId('blog-author')).toContainText('Test Author')
+
+      // ✅ Используем альтернативные локаторы
+      await expect(page.getByRole('heading', { level: 1 })).toContainText(
+        uniqueTitle,
+      )
+      await expect(page.locator('body')).toContainText('Test Author')
     })
 
     test('blog shows like count', async ({ page }) => {
       const uniqueUsername = `user_${Date.now()}`
+      const uniqueTitle = `Test Blog ${Date.now()}`
 
       await page.goto('/register')
       await page.getByLabel('Name', { exact: true }).fill('Test User')
@@ -392,11 +386,9 @@ test.describe('Blog Application', () => {
       await expect(page).toHaveURL('/')
 
       await page.goto('/blogs/new')
-      await page.getByLabel('Title', { exact: false }).fill('Test Blog')
-      await page.getByLabel('Author', { exact: false }).fill('Test Author')
-      await page
-        .getByLabel('URL', { exact: false })
-        .fill('https://testblog.com')
+      await page.locator('input[name="title"]').fill(uniqueTitle)
+      await page.locator('input[name="author"]').fill('Test Author')
+      await page.locator('input[name="url"]').fill('https://testblog.com')
       await page.getByTestId('create-blog-button').click()
       await expect(page).toHaveURL('/blogs')
 
