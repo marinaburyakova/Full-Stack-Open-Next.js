@@ -5,6 +5,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -47,13 +48,7 @@ jobs:
           echo "DATABASE_URL exists: ${#DATABASE_URL}"
           echo "NEXTAUTH_SECRET exists: ${#NEXTAUTH_SECRET}"
           echo "NEXTAUTH_URL: $NEXTAUTH_URL"
-
-      - name: Create test schema
-        run: |
-          echo "Creating test schema..."
-          npx tsx scripts/create-test-schema.ts
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          echo "NODE_ENV: $NODE_ENV"
 
       - name: Run database migrations
         run: npx drizzle-kit push
@@ -69,6 +64,7 @@ jobs:
           NODE_ENV: test
           DEBUG: 0
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          CI: true
 
       - uses: actions/upload-artifact@v4
         if: failure()
