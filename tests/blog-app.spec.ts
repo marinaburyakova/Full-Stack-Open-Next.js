@@ -9,10 +9,12 @@ test.describe('Blog Application', () => {
 
   test.describe('Authentication - UI', () => {
     test('user can register', async ({ page }) => {
+      const uniqueUsername = `user_${Date.now()}`
+
       await page.goto('/register')
 
       await page.getByLabel('Name', { exact: true }).fill('Test User')
-      await page.getByLabel('Username', { exact: true }).fill('testuser')
+      await page.getByLabel('Username', { exact: true }).fill(uniqueUsername)
       await page.getByLabel('Password', { exact: true }).fill('testpass123')
       await page
         .getByLabel('Confirm Password', { exact: true })
@@ -20,6 +22,7 @@ test.describe('Blog Application', () => {
 
       await page.getByTestId('register-button').click()
 
+      await page.waitForURL('/login', { timeout: 10000 })
       await expect(page).toHaveURL('/login')
     })
 
@@ -27,7 +30,11 @@ test.describe('Blog Application', () => {
       await page.goto('/register')
 
       await page.getByLabel('Name', { exact: true }).fill('Test User')
-      await page.getByLabel('Username', { exact: true }).fill('usr')
+
+      // ✅ 2 символа - невалидно
+      await page.getByLabel('Username', { exact: true }).fill('us')
+      await page.getByLabel('Password', { exact: true }).focus()
+
       await page.getByLabel('Password', { exact: true }).fill('testpass123')
       await page
         .getByLabel('Confirm Password', { exact: true })
@@ -35,14 +42,19 @@ test.describe('Blog Application', () => {
 
       await page.getByTestId('register-button').click()
 
-      await expect(page.getByTestId('username-error')).toBeVisible()
+      await expect(page.getByTestId('username-error')).toHaveText(
+        /Username must be at least 3 characters/,
+        { timeout: 5000 },
+      )
     })
 
     test('registration fails with mismatched passwords', async ({ page }) => {
+      const uniqueUsername = `user_${Date.now()}`
+
       await page.goto('/register')
 
       await page.getByLabel('Name', { exact: true }).fill('Test User')
-      await page.getByLabel('Username', { exact: true }).fill('testuser')
+      await page.getByLabel('Username', { exact: true }).fill(uniqueUsername)
       await page.getByLabel('Password', { exact: true }).fill('testpass123')
       await page
         .getByLabel('Confirm Password', { exact: true })
@@ -50,28 +62,39 @@ test.describe('Blog Application', () => {
 
       await page.getByTestId('register-button').click()
 
-      await expect(page.getByTestId('passwordConfirm-error')).toBeVisible()
+      await expect(page.getByTestId('passwordConfirm-error')).toHaveText(
+        /Passwords do not match/,
+        { timeout: 5000 },
+      )
     })
 
     test('login shows error with wrong credentials', async ({ page }) => {
-      // Сначала регистрируем пользователя через UI
+      // ✅ Генерируем уникальный username для каждого запуска
+      const uniqueUsername = `user_${Date.now()}`
+
+      // Регистрируем пользователя через UI
       await page.goto('/register')
       await page.getByLabel('Name', { exact: true }).fill('Test User')
-      await page.getByLabel('Username', { exact: true }).fill('testuser')
+      await page.getByLabel('Username', { exact: true }).fill(uniqueUsername)
       await page.getByLabel('Password', { exact: true }).fill('testpass123')
       await page
         .getByLabel('Confirm Password', { exact: true })
         .fill('testpass123')
       await page.getByTestId('register-button').click()
+
+      // ✅ Ждем редирект на /login
+      await page.waitForURL('/login', { timeout: 10000 })
       await expect(page).toHaveURL('/login')
 
       // Пробуем залогиниться с неправильным паролем
       await page.goto('/login')
-      await page.getByLabel('Username', { exact: true }).fill('testuser')
+      await page.getByLabel('Username', { exact: true }).fill(uniqueUsername)
       await page.getByLabel('Password', { exact: true }).fill('wrongpassword')
       await page.getByTestId('login-button').click()
 
-      await expect(page.getByTestId('error-message')).toBeVisible()
+      await expect(page.getByTestId('error-message')).toBeVisible({
+        timeout: 5000,
+      })
     })
   })
 

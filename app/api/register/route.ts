@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // Для тестов используем схему test
+    // ✅ Для тестов используем схему test
     if (process.env.NODE_ENV === 'test') {
       await db.execute(sql`SET search_path TO test`)
     }
@@ -37,19 +37,29 @@ export async function POST(request: Request) {
 
     const passwordHash = await bcrypt.hash(password, 10)
 
-    await db.insert(users).values({
-      name,
-      username,
-      passwordHash,
-    })
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        name,
+        username,
+        passwordHash,
+      })
+      .returning()
 
-    // Возвращаемся на public
+    // ✅ Возвращаемся на public
     if (process.env.NODE_ENV === 'test') {
       await db.execute(sql`SET search_path TO public`)
     }
 
     return NextResponse.json(
-      { message: 'User created successfully' },
+      {
+        message: 'User created successfully',
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          username: newUser.username,
+        },
+      },
       { status: 201 },
     )
   } catch (error) {

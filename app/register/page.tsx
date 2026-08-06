@@ -1,4 +1,3 @@
-// app/register/page.tsx
 'use client'
 
 import { useState } from 'react'
@@ -23,18 +22,29 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    console.log('📝 Form submitted')
+    console.log('📝 Username:', formData.username)
+    console.log('📝 Username length:', formData.username.length)
+
     setErrors({})
     setServerError('')
 
+    // ✅ Проверка на короткий username
     if (formData.username.length < 3) {
+      console.log('❌ Username too short!')
       setErrors({ username: 'Username must be at least 3 characters' })
+      // ❗ НЕ ОТПРАВЛЯЕМ ФОРМУ
       return
     }
 
+    // ✅ Проверка на совпадение паролей
     if (formData.password !== formData.confirmPassword) {
+      console.log('❌ Passwords do not match!')
       setErrors({ passwordConfirm: 'Passwords do not match' })
       return
     }
+
+    console.log('✅ Validation passed, sending request...')
 
     setLoading(true)
 
@@ -50,7 +60,7 @@ export default function RegisterPage() {
       })
 
       if (response.ok) {
-        router.push('/login') // ✅ ДОЛЖНО БЫТЬ ТАК
+        router.push('/login')
       } else {
         const data = await response.json()
         setServerError(data.error || 'Registration failed')
@@ -113,14 +123,15 @@ export default function RegisterPage() {
               required
               disabled={loading}
             />
-            {errors.username && (
-              <p
-                data-testid="username-error"
-                className="mt-1 text-sm text-red-600"
-              >
-                {errors.username}
-              </p>
-            )}
+            {/* ✅ data-testid="username-error" - всегда в DOM с текстом ошибки */}
+            <div
+              data-testid="username-error"
+              className="mt-1"
+            >
+              {errors.username && (
+                <p className="text-sm text-red-600">{errors.username}</p>
+              )}
+            </div>
           </div>
 
           <div>
@@ -162,14 +173,15 @@ export default function RegisterPage() {
               required
               disabled={loading}
             />
-            {errors.passwordConfirm && (
-              <p
-                data-testid="passwordConfirm-error"
-                className="mt-1 text-sm text-red-600"
-              >
-                {errors.passwordConfirm}
-              </p>
-            )}
+            {/* ✅ data-testid="passwordConfirm-error" - всегда в DOM с текстом ошибки */}
+            <div
+              data-testid="passwordConfirm-error"
+              className="mt-1"
+            >
+              {errors.passwordConfirm && (
+                <p className="text-sm text-red-600">{errors.passwordConfirm}</p>
+              )}
+            </div>
           </div>
 
           {serverError && (
