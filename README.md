@@ -1,6 +1,6 @@
 # Blog App
 
-A full-stack blog application built with Next.js, PostgreSQL, and Drizzle ORM as part of the Full Stack Open course.
+A full-stack blog application built with Next.js, PostgreSQL and Drizzle ORM.
 
 ## Features
 
