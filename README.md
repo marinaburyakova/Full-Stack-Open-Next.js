@@ -2,7 +2,7 @@
 
 A full-stack blog application built with Next.js, PostgreSQL and Drizzle ORM.
 
-## Features
+## Features 
 
 - **User Authentication** – Secure sign up and login with NextAuth.js
 - **Create Blogs** – Write and publish your own blog posts
